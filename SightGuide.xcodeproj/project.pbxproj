@@ -9,21 +9,47 @@
 /* Begin PBXBuildFile section */
 		6ADE702129C53C7200A3A84B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702029C53C7200A3A84B /* AppDelegate.swift */; };
 		6ADE702329C53C7200A3A84B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702229C53C7200A3A84B /* SceneDelegate.swift */; };
-		6ADE702529C53C7200A3A84B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702429C53C7200A3A84B /* ViewController.swift */; };
+		6ADE702529C53C7200A3A84B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702429C53C7200A3A84B /* MainViewController.swift */; };
 		6ADE702829C53C7200A3A84B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE702629C53C7200A3A84B /* Main.storyboard */; };
 		6ADE702A29C53C7300A3A84B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE702929C53C7300A3A84B /* Assets.xcassets */; };
 		6ADE702D29C53C7300A3A84B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE702B29C53C7300A3A84B /* LaunchScreen.storyboard */; };
+		6ADE703629C53DE000A3A84B /* GlanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE703529C53DE000A3A84B /* GlanceViewController.swift */; };
+		6ADE703929C53E7400A3A84B /* FixationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE703829C53E7400A3A84B /* FixationViewController.swift */; };
+		6ADE703D29C53F0A00A3A84B /* MemoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE703B29C53F0A00A3A84B /* MemoryViewController.swift */; };
+		6ADE703E29C53F0A00A3A84B /* MemoryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE703C29C53F0A00A3A84B /* MemoryViewController.xib */; };
+		6ADE704229C53F6300A3A84B /* SharingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE704029C53F6300A3A84B /* SharingViewController.swift */; };
+		6ADE704329C53F6300A3A84B /* SharingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE704129C53F6300A3A84B /* SharingViewController.xib */; };
+		6ADE704729C5497400A3A84B /* glance_fixed_prompt.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE704629C5497400A3A84B /* glance_fixed_prompt.m4a */; };
+		6ADE704B29C54FC800A3A84B /* GlanceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE704A29C54FC800A3A84B /* GlanceViewController.xib */; };
+		6ADE704E29C5A5C800A3A84B /* GlanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE704C29C5A5C800A3A84B /* GlanceCollectionViewCell.swift */; };
+		6ADE704F29C5A5C800A3A84B /* GlanceCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE704D29C5A5C800A3A84B /* GlanceCollectionViewCell.xib */; };
+		6ADE705129C5ABB300A3A84B /* glance_mock.json in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE705029C5ABB300A3A84B /* glance_mock.json */; };
+		6ADE705329C5AC4B00A3A84B /* SceneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE705229C5AC4B00A3A84B /* SceneModel.swift */; };
+		6ADE705629C5BE3800A3A84B /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE705529C5BE3800A3A84B /* Toast.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6ADE701D29C53C7200A3A84B /* SightGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SightGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ADE702029C53C7200A3A84B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6ADE702229C53C7200A3A84B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		6ADE702429C53C7200A3A84B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6ADE702429C53C7200A3A84B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		6ADE702729C53C7200A3A84B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		6ADE702929C53C7300A3A84B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6ADE702C29C53C7300A3A84B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6ADE702E29C53C7300A3A84B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6ADE703529C53DE000A3A84B /* GlanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlanceViewController.swift; sourceTree = "<group>"; };
+		6ADE703829C53E7400A3A84B /* FixationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixationViewController.swift; sourceTree = "<group>"; };
+		6ADE703B29C53F0A00A3A84B /* MemoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryViewController.swift; sourceTree = "<group>"; };
+		6ADE703C29C53F0A00A3A84B /* MemoryViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemoryViewController.xib; sourceTree = "<group>"; };
+		6ADE704029C53F6300A3A84B /* SharingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingViewController.swift; sourceTree = "<group>"; };
+		6ADE704129C53F6300A3A84B /* SharingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SharingViewController.xib; sourceTree = "<group>"; };
+		6ADE704629C5497400A3A84B /* glance_fixed_prompt.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = glance_fixed_prompt.m4a; sourceTree = "<group>"; };
+		6ADE704A29C54FC800A3A84B /* GlanceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GlanceViewController.xib; sourceTree = "<group>"; };
+		6ADE704C29C5A5C800A3A84B /* GlanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlanceCollectionViewCell.swift; sourceTree = "<group>"; };
+		6ADE704D29C5A5C800A3A84B /* GlanceCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GlanceCollectionViewCell.xib; sourceTree = "<group>"; };
+		6ADE705029C5ABB300A3A84B /* glance_mock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = glance_mock.json; sourceTree = "<group>"; };
+		6ADE705229C5AC4B00A3A84B /* SceneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneModel.swift; sourceTree = "<group>"; };
+		6ADE705529C5BE3800A3A84B /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,15 +82,84 @@
 		6ADE701F29C53C7200A3A84B /* SightGuide */ = {
 			isa = PBXGroup;
 			children = (
+				6ADE704429C53FB400A3A84B /* Main */,
+				6ADE703429C53DC200A3A84B /* Glance */,
+				6ADE703A29C53ED900A3A84B /* Memory */,
+				6ADE703F29C53F4300A3A84B /* Sharing */,
+				6ADE703729C53E5E00A3A84B /* Fixation */,
+				6ADE705429C5BE2000A3A84B /* Helpers */,
 				6ADE702029C53C7200A3A84B /* AppDelegate.swift */,
 				6ADE702229C53C7200A3A84B /* SceneDelegate.swift */,
-				6ADE702429C53C7200A3A84B /* ViewController.swift */,
+				6ADE704529C5497400A3A84B /* Resources */,
 				6ADE702629C53C7200A3A84B /* Main.storyboard */,
 				6ADE702929C53C7300A3A84B /* Assets.xcassets */,
 				6ADE702B29C53C7300A3A84B /* LaunchScreen.storyboard */,
 				6ADE702E29C53C7300A3A84B /* Info.plist */,
 			);
 			path = SightGuide;
+			sourceTree = "<group>";
+		};
+		6ADE703429C53DC200A3A84B /* Glance */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE703529C53DE000A3A84B /* GlanceViewController.swift */,
+				6ADE704A29C54FC800A3A84B /* GlanceViewController.xib */,
+				6ADE704C29C5A5C800A3A84B /* GlanceCollectionViewCell.swift */,
+				6ADE704D29C5A5C800A3A84B /* GlanceCollectionViewCell.xib */,
+				6ADE705229C5AC4B00A3A84B /* SceneModel.swift */,
+			);
+			path = Glance;
+			sourceTree = "<group>";
+		};
+		6ADE703729C53E5E00A3A84B /* Fixation */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE703829C53E7400A3A84B /* FixationViewController.swift */,
+			);
+			path = Fixation;
+			sourceTree = "<group>";
+		};
+		6ADE703A29C53ED900A3A84B /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE703B29C53F0A00A3A84B /* MemoryViewController.swift */,
+				6ADE703C29C53F0A00A3A84B /* MemoryViewController.xib */,
+			);
+			path = Memory;
+			sourceTree = "<group>";
+		};
+		6ADE703F29C53F4300A3A84B /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE704029C53F6300A3A84B /* SharingViewController.swift */,
+				6ADE704129C53F6300A3A84B /* SharingViewController.xib */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
+		6ADE704429C53FB400A3A84B /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE702429C53C7200A3A84B /* MainViewController.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		6ADE704529C5497400A3A84B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE704629C5497400A3A84B /* glance_fixed_prompt.m4a */,
+				6ADE705029C5ABB300A3A84B /* glance_mock.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6ADE705429C5BE2000A3A84B /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE705529C5BE3800A3A84B /* Toast.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,7 +221,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				6ADE702D29C53C7300A3A84B /* LaunchScreen.storyboard in Resources */,
+				6ADE705129C5ABB300A3A84B /* glance_mock.json in Resources */,
+				6ADE704729C5497400A3A84B /* glance_fixed_prompt.m4a in Resources */,
+				6ADE703E29C53F0A00A3A84B /* MemoryViewController.xib in Resources */,
+				6ADE704B29C54FC800A3A84B /* GlanceViewController.xib in Resources */,
 				6ADE702A29C53C7300A3A84B /* Assets.xcassets in Resources */,
+				6ADE704329C53F6300A3A84B /* SharingViewController.xib in Resources */,
+				6ADE704F29C5A5C800A3A84B /* GlanceCollectionViewCell.xib in Resources */,
 				6ADE702829C53C7200A3A84B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,8 +239,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6ADE702529C53C7200A3A84B /* ViewController.swift in Sources */,
+				6ADE702529C53C7200A3A84B /* MainViewController.swift in Sources */,
+				6ADE704229C53F6300A3A84B /* SharingViewController.swift in Sources */,
+				6ADE704E29C5A5C800A3A84B /* GlanceCollectionViewCell.swift in Sources */,
 				6ADE702129C53C7200A3A84B /* AppDelegate.swift in Sources */,
+				6ADE703629C53DE000A3A84B /* GlanceViewController.swift in Sources */,
+				6ADE703D29C53F0A00A3A84B /* MemoryViewController.swift in Sources */,
+				6ADE705329C5AC4B00A3A84B /* SceneModel.swift in Sources */,
+				6ADE705629C5BE3800A3A84B /* Toast.swift in Sources */,
+				6ADE703929C53E7400A3A84B /* FixationViewController.swift in Sources */,
 				6ADE702329C53C7200A3A84B /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -287,6 +395,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DUPQ36T9L8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SightGuide/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -314,6 +423,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DUPQ36T9L8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SightGuide/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
