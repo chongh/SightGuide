@@ -5,24 +5,14 @@
 //  Created by FindTheLamp on 2023/3/18.
 //
 
-import UIKit
 import AVFoundation
+import UIKit
 
 private let CellReuseID = "GlanceCell"
 
 final class GlanceViewController: UIViewController {
     
-    // Init
-    
-    init() {
-        super.init(nibName: "GlanceViewController", bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // View controller
+    // MARK: - Init
     
     // views
     @IBOutlet weak var collectionView: UICollectionView!
@@ -33,8 +23,18 @@ final class GlanceViewController: UIViewController {
     
     // data
     private var scene: Scene?
-    private var currentItemIndex = 0
+    private var currentItemIndex = -1
     private var selectedItemIndex: Int? = 0
+    
+    init() {
+        super.init(nibName: "GlanceViewController", bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - View controller
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,10 +49,19 @@ final class GlanceViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
         playFixedPrompt()
     }
     
-    // Setup
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        fixedPromptAudioPlayer?.pause()
+        synthesizer.pauseSpeaking(at: .immediate)
+    }
+    
+    // MARK: - Setup
     
     private func setupViewController() {
         collectionView.register(
@@ -97,7 +106,7 @@ final class GlanceViewController: UIViewController {
         synthesizer.delegate = self
     }
     
-    // Data
+    // MARK: - Data
     
     func parseSceneFromJSON() {
         if let url = Bundle.main.url(forResource: "glance_mock", withExtension: "json") {
@@ -111,10 +120,11 @@ final class GlanceViewController: UIViewController {
         }
     }
     
-    // Audio
+    // MARK: - Audio
     
     func playFixedPrompt() {
-        fixedPromptAudioPlayer?.play()
+//        fixedPromptAudioPlayer?.play()
+        readText(text: "单指双击物体，上滑为标记喜欢，下滑为不感兴趣")
     }
     
     func readCurrentSceneItem() {
@@ -139,7 +149,7 @@ final class GlanceViewController: UIViewController {
         synthesizer.speak(speechUtterance)
     }
     
-    // Actions
+    // MARK: - Actions
     
     @objc func threeFingerSwipeDown() {
         let fixationViewController = FixationViewController()

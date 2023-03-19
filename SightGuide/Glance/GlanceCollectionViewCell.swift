@@ -25,20 +25,7 @@ final class GlanceCollectionViewCell: UICollectionViewCell {
     {
         titleLabel.text = item.objName
         subtitleLabel.text = item.text
-        borderView.backgroundColor = Self.colorOfItemType(type: item.type)
-    }
-    
-    static func colorOfItemType(type: Int) -> UIColor {
-        switch type {
-        case 1:
-            return UIColor.yellow
-        case 2:
-            return UIColor.blue
-        case 3:
-            return UIColor.green
-        default:
-            return UIColor.white
-        }
+        borderView.backgroundColor = Specs.colorOfItemType(type: item.type)
     }
     
     private func configureDoubleTapGesture() {
