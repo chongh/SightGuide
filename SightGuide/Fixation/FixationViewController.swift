@@ -20,13 +20,14 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     // audio
     private var beepAudioPlayer: AVAudioPlayer?
-    private var audioRecorder: AVAudioRecorder?
     
     // data and state
+    public var fromScene: Scene? = nil
     private var scene: Scene?
     private var isRootScene: Bool = true
     private var isMarking: Bool = false
     private var labeledObjIds: Set<Int> = []
+    private var pendingDismiss = false
     
     // timer
     private var timer: Timer?
@@ -60,7 +61,15 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         super.viewDidAppear(animated)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.parseAndRenderMainScene()
+            if
+                let fromScene = self.fromScene,
+                !fromScene.sceneId.hasSuffix("_1")
+            {
+                self.parseAndRenderSubScene()
+            } else {
+                self.parseAndRenderMainScene()
+            }
+            self.isRootScene = true
             self.readSceneName()
         }
     }
@@ -164,10 +173,15 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func readLastTouchedView() {
-        readText(text: lastTouchedView?.item?.objName ?? "")
+        var text = lastTouchedView?.item?.objName ?? ""
+        if fromScene != nil {
+            text += lastTouchedView?.item?.labelId == nil ? "无" : "有"
+            text += "标签"
+        }
+        readText(text: text)
     }
     
-    // Gestures
+    // MARK: - Gestures
     
     private func setupGestures() {
         setupPanGesture()
@@ -223,17 +237,31 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @objc func handleTwoFingerSwipeLeftGesture() {
-        guard !isRootScene else {
-            return
+        if isRootScene {
+            if fromScene != nil {
+                readText(text: "为您返回标签目录")
+                pendingDismiss = true
+            }
+        } else {
+            // return to root scene
+            isRootScene = true
+            parseAndRenderMainScene()
+            readText(text: "为您返回\(scene?.sceneName ?? "")")
         }
-        
-        parseAndRenderMainScene()
-        readText(text: "为您返回\(scene?.sceneName ?? "")")
     }
     
     @objc func handleTapItemViewGesture(_ sender: UITapGestureRecognizer) {
         if let itemView = sender.view as? FixationItemView {
-            readText(text: itemView.item?.text ?? "")
+            if
+                fromScene != nil,
+                itemView.item?.labelId != nil
+            {
+                AudioHelper.playRecording(
+                    sceneID: scene?.sceneId ?? "",
+                    objectID: itemView.item?.objId ?? 0)
+            } else {
+                readText(text: itemView.item?.text ?? "")
+            }
         }
     }
     
@@ -245,6 +273,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         else { return }
         
         if (!(item.sceneId?.isEmpty ?? true)) {
+            isRootScene = false
             parseAndRenderSubScene()
             readSceneName()
         }
@@ -268,7 +297,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     @objc func handleDoubleLongPressGesture(_ gesture: UILongPressGestureRecognizer) {
         guard let lastDoubleTapTimestamp = lastDoubleTapTimestamp else { return }
-        
         
         if gesture.state == .began {
             if Date().timeIntervalSince1970 - lastDoubleTapTimestamp <= 5 {
@@ -295,7 +323,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     func endMarkFocusedItemView() {
         isMarking = false
-        endRecording()
+        AudioHelper.endRecording()
         
         guard
             let item = lastTouchedView?.item
@@ -312,33 +340,9 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             let item = lastTouchedView?.item
         else { return }
         
-        let recordingSession = AVAudioSession.sharedInstance()
-        do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
-            try recordingSession.setActive(true)
-            
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let audioFileURL = documentsDirectory.appendingPathComponent("scene_\(scene?.sceneId ?? "")_obj_\(item.objId).m4a")
-            
-            let settings: [String: Any] = [
-                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-                AVSampleRateKey: 44100,
-                AVNumberOfChannelsKey: 2,
-                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-            ]
-            
-            audioRecorder = try AVAudioRecorder(url: audioFileURL, settings: settings)
-            audioRecorder?.delegate = self
-            audioRecorder?.prepareToRecord()
-            audioRecorder?.record()
-        } catch {
-            print("Failed to start recording: \(error.localizedDescription)")
-        }
-    }
-    
-    func endRecording() {
-        guard let recorder = audioRecorder else { return }
-        recorder.stop()
+        AudioHelper.startRecording(
+            sceneID: scene?.sceneId ?? "",
+            objectID: item.objId)
     }
     
     private func readSceneName() {
@@ -360,13 +364,11 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func parseAndRenderMainScene() {
-        isRootScene = true
         parseSceneFromJSON(mock: "fixation_mock")
         renderFixationItemViews()
     }
     
     private func parseAndRenderSubScene() {
-        isRootScene = false
         parseSceneFromJSON(mock: "fixation_subscene_mock")
         renderFixationItemViews()
     }
@@ -399,7 +401,9 @@ extension FixationViewController: UIGestureRecognizerDelegate {
 
 extension FixationViewController: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        if isMarking {
+        if pendingDismiss {
+            dismiss(animated: true, completion: nil)
+        } else if isMarking {
             startRecording()
         }
     }

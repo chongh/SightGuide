@@ -1,0 +1,23 @@
+{
+    "data": [{
+        "scene_id": "1_1",
+        "scene_name": "大场景1",
+        "labels": [{
+            "label_id": 63,
+            "label_name": "影子",
+            "duration": 10,
+        }]
+    }, {
+        "scene_id": "1_100",
+        "scene_name": "小场景表",
+        "labels": [{
+            "label_id": 61,
+            "label_name": "背包",
+            "duration": 3,
+        }, {
+            "label_id": 67,
+            "label_name": "门",
+            "duration": 0,
+        }]
+    }]
+}

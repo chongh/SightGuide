@@ -128,7 +128,7 @@ final class GlanceViewController: UIViewController {
     }
     
     func readCurrentSceneItem() {
-        if currentItemIndex >= scene?.objs.count ?? 0 {
+        if currentItemIndex >= scene?.objs?.count ?? 0 {
             return
         }
         
@@ -139,7 +139,7 @@ final class GlanceViewController: UIViewController {
             animated: true)
         selectedItemIndex = nil
         
-        guard let item = scene?.objs[currentItemIndex] else { return }
+        guard let item = scene?.objs?[currentItemIndex] else { return }
         readText(text: item.text)
     }
     
@@ -175,7 +175,7 @@ final class GlanceViewController: UIViewController {
     @objc func swipeGestureHandler(_ sender: UISwipeGestureRecognizer) {
         guard
             let selectedItemIndex = selectedItemIndex,
-            let item = scene?.objs[selectedItemIndex]
+            let item = scene?.objs?[selectedItemIndex]
         else {
             // no item selected
             return
@@ -192,12 +192,12 @@ final class GlanceViewController: UIViewController {
 extension GlanceViewController: UICollectionViewDataSource
 {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return scene?.objs.count ?? 0;
+        return scene?.objs?.count ?? 0;
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellReuseID, for: indexPath) as! GlanceCollectionViewCell
-        if let sceneItem = scene?.objs[indexPath.item] {
+        if let sceneItem = scene?.objs?[indexPath.item] {
             cell.renderSceneItem(item: sceneItem)
             cell.doubleTapAction = { [weak self] in
                 self?.selectedItemIndex = indexPath.item
