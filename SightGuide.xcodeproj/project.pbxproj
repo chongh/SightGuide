@@ -41,6 +41,7 @@
 		6ADE707329C73D3900A3A84B /* MemorySectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE707129C73D3900A3A84B /* MemorySectionHeaderView.swift */; };
 		6ADE707429C73D3900A3A84B /* MemorySectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE707229C73D3900A3A84B /* MemorySectionHeaderView.xib */; };
 		6ADE707629C8442E00A3A84B /* AudioHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE707529C8442E00A3A84B /* AudioHelper.swift */; };
+		6ADE707829C93FC700A3A84B /* NetworkRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE707729C93FC700A3A84B /* NetworkRequester.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,7 @@
 		6ADE707129C73D3900A3A84B /* MemorySectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemorySectionHeaderView.swift; sourceTree = "<group>"; };
 		6ADE707229C73D3900A3A84B /* MemorySectionHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemorySectionHeaderView.xib; sourceTree = "<group>"; };
 		6ADE707529C8442E00A3A84B /* AudioHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioHelper.swift; sourceTree = "<group>"; };
+		6ADE707729C93FC700A3A84B /* NetworkRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequester.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,7 +138,6 @@
 				6ADE704A29C54FC800A3A84B /* GlanceViewController.xib */,
 				6ADE704C29C5A5C800A3A84B /* GlanceCollectionViewCell.swift */,
 				6ADE704D29C5A5C800A3A84B /* GlanceCollectionViewCell.xib */,
-				6ADE705229C5AC4B00A3A84B /* SceneModel.swift */,
 			);
 			path = Glance;
 			sourceTree = "<group>";
@@ -178,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				6ADE702429C53C7200A3A84B /* MainViewController.swift */,
+				6ADE705229C5AC4B00A3A84B /* SceneModel.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -203,6 +205,7 @@
 				6ADE705929C5CA4800A3A84B /* NavigationTopViewController.swift */,
 				6ADE706529C5EA7700A3A84B /* Specs.swift */,
 				6ADE707529C8442E00A3A84B /* AudioHelper.swift */,
+				6ADE707729C93FC700A3A84B /* NetworkRequester.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				6ADE703D29C53F0A00A3A84B /* MemoryViewController.swift in Sources */,
 				6ADE706F29C6CB9B00A3A84B /* MemoryCollectionViewCell.swift in Sources */,
 				6ADE705C29C5DD2A00A3A84B /* FixationItemView.swift in Sources */,
+				6ADE707829C93FC700A3A84B /* NetworkRequester.swift in Sources */,
 				6ADE705329C5AC4B00A3A84B /* SceneModel.swift in Sources */,
 				6ADE705A29C5CA4800A3A84B /* NavigationTopViewController.swift in Sources */,
 				6ADE705629C5BE3800A3A84B /* Toast.swift in Sources */,

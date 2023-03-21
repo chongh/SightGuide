@@ -23,6 +23,7 @@ final class GlanceViewController: UIViewController {
     
     // data
     private var scene: Scene?
+    private var seenObjs: Set<Int> = []
     private var currentItemIndex = -1
     private var selectedItemIndex: Int? = 0
     
@@ -43,15 +44,15 @@ final class GlanceViewController: UIViewController {
         setupAudioPlayer()
         setupSwipeGesture()
         setupDoubleTapGesture()
-        
-        parseSceneFromJSON()
-        collectionView?.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         playFixedPrompt()
+        
+        parseSceneFromJSON()
+        collectionView?.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -72,7 +73,7 @@ final class GlanceViewController: UIViewController {
     }
     
     private func setupSwipeGesture() {
-        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(threeFingerSwipeDown))
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(threeFingerSwipeDownGestureHandler))
         swipeGesture.direction = .down
         swipeGesture.numberOfTouchesRequired = 3
         view.addGestureRecognizer(swipeGesture)
@@ -87,7 +88,7 @@ final class GlanceViewController: UIViewController {
     }
     
     private func setupDoubleTapGesture() {
-        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapWithTwoFingers))
+        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapWithTwoFingersGestureHandler))
         doubleTapGesture.numberOfTapsRequired = 2
         doubleTapGesture.numberOfTouchesRequired = 2
         view.addGestureRecognizer(doubleTapGesture)
@@ -113,17 +114,44 @@ final class GlanceViewController: UIViewController {
             do {
                 let data = try Data(contentsOf: url)
                 let decoder = JSONDecoder()
-                scene = try decoder.decode(Scene.self, from: data)
+                
+                var newScene = try decoder.decode(Scene.self, from: data)
+                
+                // remove objs with duplicate ID
+                //                newScene.objs = newScene.objs?.filter({ obj in
+                //                    !seenObjs.contains(obj.objId)
+                //                })
+                
+                scene = newScene
+                for obj in scene?.objs ?? [] {
+                    seenObjs.insert(obj.objId)
+                }
             } catch {
                 print("Error parsing JSON: \(error)")
             }
         }
+        
+//        NetworkRequester.getScene { result in
+//            switch result {
+//            case .success(let sceneResponse):
+//                var newScene = sceneResponse
+//
+//                // remove objs with duplicate ID
+//                newScene.objs = newScene.objs?.filter({ obj in
+//                    !self.seenObjs.contains(obj.objId)
+//                })
+//
+//                self.scene = newScene
+//            case .failure(let error):
+//                print("Error: \(error)")
+//            }
+//        }
     }
     
     // MARK: - Audio
     
     func playFixedPrompt() {
-//        fixedPromptAudioPlayer?.play()
+        //        fixedPromptAudioPlayer?.play()
         readText(text: "单指双击物体，上滑为标记喜欢，下滑为不感兴趣")
     }
     
@@ -151,13 +179,13 @@ final class GlanceViewController: UIViewController {
     
     // MARK: - Actions
     
-    @objc func threeFingerSwipeDown() {
+    @objc func threeFingerSwipeDownGestureHandler() {
         let fixationViewController = FixationViewController()
         fixationViewController.modalPresentationStyle = .fullScreen
         present(fixationViewController, animated: true, completion: nil)
     }
     
-    @objc func doubleTapWithTwoFingers() {
+    @objc func doubleTapWithTwoFingersGestureHandler() {
         if synthesizer.isSpeaking {
             synthesizer.pauseSpeaking(at: .immediate)
         } else {
@@ -205,8 +233,6 @@ extension GlanceViewController: UICollectionViewDataSource
         }
         return cell
     }
-    
-    
 }
 
 extension GlanceViewController: UICollectionViewDelegateFlowLayout

@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct Scene: Decodable {
+struct Scene: Codable {
     let sceneId: String
     let sceneName: String?
-    let objs: [SceneItem]?
+    var objs: [SceneItem]?
     let labels: [Label]?
     
     enum CodingKeys: String, CodingKey {
@@ -21,7 +21,7 @@ struct Scene: Decodable {
     }
 }
 
-struct SceneItem: Decodable {
+struct SceneItem: Codable {
     let objId: Int
     let objName: String
     let type: Int
@@ -47,7 +47,7 @@ struct Position: Codable {
     let x0, y0, h, w: CGFloat
 }
 
-struct Label: Decodable {
+struct Label: Codable {
     let labelId: Int
     let labelName: String
     let duration: Int
@@ -59,6 +59,14 @@ struct Label: Decodable {
     }
 }
 
-struct MemoryResponse: Decodable {
+struct MemoryResponse: Codable {
     let data: [Scene]
+}
+
+struct CommonResponse: Codable {
+    let result: Int
+}
+
+struct IMUData: Codable {
+    let imu: Int
 }

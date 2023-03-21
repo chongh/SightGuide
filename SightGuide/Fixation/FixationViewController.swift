@@ -191,14 +191,14 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func setupSwipeGesture() {
-        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(threeFingerSwipeUp))
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
         swipeGesture.direction = .up
         swipeGesture.numberOfTouchesRequired = 3
         swipeGesture.delegate = self
         view.addGestureRecognizer(swipeGesture)
     }
     
-    @objc func threeFingerSwipeUp() {
+    @objc func handleThreeFingerSwipeUpGesture() {
         dismiss(animated: true, completion: nil)
     }
     
@@ -240,7 +240,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         if isRootScene {
             if fromScene != nil {
                 readText(text: "为您返回标签目录")
-                pendingDismiss = true
+//                pendingDismiss = true
+                dismiss(animated: true, completion: nil)
             }
         } else {
             // return to root scene
@@ -328,7 +329,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         guard
             let item = lastTouchedView?.item
         else { return }
-        readText(text: "您已为\(item.objName)\(labeledObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
+        readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
         
         labeledObjIds.insert(item.objId)
         lastTouchedView?.displayDot()
