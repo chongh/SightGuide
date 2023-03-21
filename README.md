@@ -19,6 +19,7 @@
   - NavigationTopViewController: 切换横竖屏时用到的工具方法。
   - Specs：包含用到的颜色。
   - AudioHelper：包含录音和播放录音功能。
+  - NetworkRequester：用于网络请求。
 - Resources：这里是 app 用到的资源文件，包括图片、音频和 mock 数据。
 
 下面介绍几个主要模块。
@@ -43,7 +44,7 @@
 - 调用 `playFixedPrompt` 播放固定提示语
 > 注意：如果有录好的固定提示语，可替换 Resource 文件夹下的 `glance_fixed_promt` 文件，并将 `playFixedPrompt` 中的代码改为目前注释掉的代码。
 - 调用 `parseSceneFromJSON` 加载数据
-> 注意：此处的数据目前为 mock 数据，后续需要改为从后端接口获取数据。
+> 注意：此处的数据目前为 mock 数据，后续需要改为从后端接口获取数据。这里有一个向后端发起请求的例子，目前代码被注释掉了。
 
 > 注意：每次获取数据后，将所有的 objs 的 ID 保存在 `seenObjs` 中用于去重。由于 mock 数据不会变化，目前去重的逻辑被注释掉。
 - 刷新界面
