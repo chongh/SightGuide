@@ -17,6 +17,7 @@ final class MemoryViewController: UIViewController {
     
     // views
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var blockView: UIView!
     
     // audio
     private let synthesizer = AVSpeechSynthesizer()
@@ -39,7 +40,7 @@ final class MemoryViewController: UIViewController {
     }
     
     // MARK: - View Controller
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -65,8 +66,7 @@ final class MemoryViewController: UIViewController {
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: SectionHeaderID)
         
-        parseDataFromJSON(mock: "memory_mock")
-        collectionView.reloadData()
+        requestData()
     }
     
     // MARK: - Gestures
@@ -115,14 +115,24 @@ final class MemoryViewController: UIViewController {
     
     // MARK: - Data
     
-    private func parseDataFromJSON(mock: String) {
-        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
-            do {
-                let response = try Data(contentsOf: url)
-                let decoder = JSONDecoder()
-                data = try decoder.decode(MemoryResponse.self, from: response)
-            } catch {
-                print("Error parsing JSON: \(error)")
+    private func requestData() {
+//        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
+//            do {
+//                let response = try Data(contentsOf: url)
+//                let decoder = JSONDecoder()
+//                data = try decoder.decode(MemoryResponse.self, from: response)
+//            } catch {
+//                print("Error parsing JSON: \(error)")
+//            }
+//        }
+        
+        NetworkRequester.requestMemoryLabels { result in
+            switch result {
+            case .success(let response):
+                self.data = response
+                self.collectionView.reloadData()
+            case .failure(let error):
+                print("Error: \(error)")
             }
         }
     }
@@ -158,12 +168,12 @@ extension MemoryViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return data?.data.count ?? 0
     }
-
+    
     // Number of items in each section
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return data?.data[section].labels?.count ?? 0
     }
-
+    
     // Configure each cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID, for: indexPath) as! MemoryCollectionViewCell
@@ -175,7 +185,7 @@ extension MemoryViewController: UICollectionViewDataSource {
         }
         return cell
     }
-
+    
     // Configure the header view for each section
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
@@ -193,17 +203,17 @@ extension MemoryViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 50)
     }
-
+    
     // Spacing between cells
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
-
+    
     // Spacing between lines
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 20
     }
-
+    
     // Header size
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 50)
@@ -219,12 +229,20 @@ extension MemoryViewController: UIGestureRecognizerDelegate {
 extension MemoryViewController: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         if let indexPath = lastSelectedIndexPath {
-            AudioHelper.playRecording(
-                sceneID: data?.data[indexPath.section].sceneId ?? "",
-                objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
+            if let recordName = data?.data[indexPath.section].labels?[indexPath.item].recordName {
+                NetworkRequester.requestLabelAudioAndPlay(
+                    sceneID: data?.data[indexPath.section].sceneId ?? "",
+                    labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
+                    recordName: recordName)
+            } else {
+                AudioHelper.playRecording(
+                    sceneID: data?.data[indexPath.section].sceneId ?? "",
+                    objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
+            }
         } else if let indexPath = indexPathPendingExpand {
             let fixationViewController = FixationViewController()
             fixationViewController.fromScene = data?.data[indexPath.section]
+            fixationViewController.isFromLabel = true
             fixationViewController.modalPresentationStyle = .fullScreen
             present(fixationViewController, animated: true, completion: nil)
             

@@ -51,11 +51,13 @@ struct Label: Codable {
     let labelId: Int
     let labelName: String
     let duration: Int
+    let recordName: String?
     
     enum CodingKeys: String, CodingKey {
         case labelId = "label_id"
         case labelName = "label_name"
         case duration
+        case recordName = "record_name"
     }
 }
 
@@ -69,4 +71,12 @@ struct CommonResponse: Codable {
 
 struct IMUData: Codable {
     let imu: Int
+}
+
+struct CreateLabelResponse: Codable {
+    let labelId: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case labelId = "label_id"
+    }
 }

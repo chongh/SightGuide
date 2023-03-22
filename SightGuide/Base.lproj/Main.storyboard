@@ -36,7 +36,7 @@
                                 <rect key="frame" x="70" y="221" width="252" height="114"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Glance"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Glance and Fixation"/>
                                 <connections>
                                     <action selector="glanceButtonClickedAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="MuN-Zu-P6l"/>
                                 </connections>

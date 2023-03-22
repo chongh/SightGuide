@@ -15,6 +15,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private let synthesizer = AVSpeechSynthesizer()
     
     // views
+    @IBOutlet weak var backgroundImageView: UIImageView!
+    @IBOutlet weak var blockView: UIView!
     private var fixationItemViews: [FixationItemView] = []
     private var lastTouchedView: FixationItemView?
     
@@ -25,6 +27,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     public var fromScene: Scene? = nil
     private var scene: Scene?
     private var isRootScene: Bool = true
+    public var isFromLabel: Bool = false
     private var isMarking: Bool = false
     private var labeledObjIds: Set<Int> = []
     private var pendingDismiss = false
@@ -50,6 +53,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         setupGestures()
         setupAudioPlayer()
         
+        setupBackgroundImageView()
         setupFixationItemViews()
     }
     
@@ -81,6 +85,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     // MARK: - View
+    
+    private func setupBackgroundImageView() {
+        NetworkRequester.requestFixationImage(sceneId: fromScene?.sceneId ?? "") { image in
+            print("image!")
+            self.backgroundImageView.image = image
+        }
+    }
     
     private func setupFixationItemViews() {
         for _ in 0..<20 {
@@ -174,7 +185,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func readLastTouchedView() {
         var text = lastTouchedView?.item?.objName ?? ""
-        if fromScene != nil {
+        if isFromLabel {
             text += lastTouchedView?.item?.labelId == nil ? "无" : "有"
             text += "标签"
         }
@@ -238,7 +249,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     @objc func handleTwoFingerSwipeLeftGesture() {
         if isRootScene {
-            if fromScene != nil {
+            if isFromLabel {
                 readText(text: "为您返回标签目录")
 //                pendingDismiss = true
                 dismiss(animated: true, completion: nil)
@@ -254,7 +265,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     @objc func handleTapItemViewGesture(_ sender: UITapGestureRecognizer) {
         if let itemView = sender.view as? FixationItemView {
             if
-                fromScene != nil,
+                isFromLabel,
                 itemView.item?.labelId != nil
             {
                 AudioHelper.playRecording(
@@ -324,15 +335,28 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     func endMarkFocusedItemView() {
         isMarking = false
-        AudioHelper.endRecording()
         
         guard
             let item = lastTouchedView?.item
         else { return }
-        readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
         
-        labeledObjIds.insert(item.objId)
-        lastTouchedView?.displayDot()
+        if AudioHelper.isRecording() {
+            AudioHelper.endRecording()
+            
+            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
+            
+            labeledObjIds.insert(item.objId)
+            lastTouchedView?.displayDot()
+            
+            uploadLabelVoice(objectID: item.objId, objectName: item.objName)
+        } else {
+            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")标签")
+            
+            self.createLabel(
+                objectID: item.objId,
+                objectName: item.objName,
+                recordName: nil)
+        }
     }
     
     func startRecording() {
@@ -372,6 +396,38 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private func parseAndRenderSubScene() {
         parseSceneFromJSON(mock: "fixation_subscene_mock")
         renderFixationItemViews()
+    }
+    
+    private func uploadLabelVoice(objectID: Int, objectName: String) {
+        NetworkRequester.requestUploadLabelVoice(
+            sceneID: scene?.sceneId ?? "",
+            objectID: objectID) { recordName, error in
+                if let error = error {
+                    print(error)
+                    return
+                }
+                
+                self.createLabel(
+                    objectID: objectID,
+                    objectName: objectName,
+                    recordName: recordName)
+            }
+    }
+    
+    private func createLabel(
+        objectID: Int,
+        objectName: String,
+        recordName: String?)
+    {
+        NetworkRequester.requestCreateLabel(
+            sceneID: self.scene?.sceneId ?? "",
+            sceneName: self.scene?.sceneName ?? "",
+            objectID: objectID,
+            objectName: objectName,
+            recordName: recordName ?? "",
+            completion: { result in
+                print(result)
+            })
     }
     
     // MARK: - Landscape

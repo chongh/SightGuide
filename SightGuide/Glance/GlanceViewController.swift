@@ -15,6 +15,7 @@ final class GlanceViewController: UIViewController {
     // MARK: - Init
     
     // views
+    @IBOutlet weak var blockView: UIView!
     @IBOutlet weak var collectionView: UICollectionView!
     
     // audio
@@ -25,7 +26,10 @@ final class GlanceViewController: UIViewController {
     private var scene: Scene?
     private var seenObjs: Set<Int> = []
     private var currentItemIndex = -1
-    private var selectedItemIndex: Int? = 0
+    private var selectedItemIndex: Int? = nil
+    
+    // timer
+    private var timer: Timer?
     
     init() {
         super.init(nibName: "GlanceViewController", bundle: nil)
@@ -51,8 +55,8 @@ final class GlanceViewController: UIViewController {
         
         playFixedPrompt()
         
-        parseSceneFromJSON()
-        collectionView?.reloadData()
+        requestScene()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -60,6 +64,10 @@ final class GlanceViewController: UIViewController {
         
         fixedPromptAudioPlayer?.pause()
         synthesizer.pauseSpeaking(at: .immediate)
+    }
+    
+    func refreshViews() {
+        collectionView?.reloadData()
     }
     
     // MARK: - Setup
@@ -109,43 +117,50 @@ final class GlanceViewController: UIViewController {
     
     // MARK: - Data
     
-    func parseSceneFromJSON() {
-        if let url = Bundle.main.url(forResource: "glance_mock", withExtension: "json") {
-            do {
-                let data = try Data(contentsOf: url)
-                let decoder = JSONDecoder()
-                
-                var newScene = try decoder.decode(Scene.self, from: data)
-                
+    func requestScene() {
+        NetworkRequester.getScene { result in
+            switch result {
+            case .success(let sceneResponse):
+                var newScene = sceneResponse
+
                 // remove objs with duplicate ID
-                //                newScene.objs = newScene.objs?.filter({ obj in
-                //                    !seenObjs.contains(obj.objId)
-                //                })
+                newScene.objs = newScene.objs?.filter({ obj in
+                    !self.seenObjs.contains(obj.objId)
+                })
                 
-                scene = newScene
-                for obj in scene?.objs ?? [] {
-                    seenObjs.insert(obj.objId)
+                for obj in newScene.objs ?? [] {
+                    self.seenObjs.insert(obj.objId)
                 }
-            } catch {
-                print("Error parsing JSON: \(error)")
+
+                self.updateScene(newScene)
+            case .failure(let error):
+                print("Error: \(error)")
             }
         }
+    }
+    
+    private func updateScene(_ scene: Scene) {
+        selectedItemIndex = nil
+        self.scene = scene
         
-//        NetworkRequester.getScene { result in
-//            switch result {
-//            case .success(let sceneResponse):
-//                var newScene = sceneResponse
-//
-//                // remove objs with duplicate ID
-//                newScene.objs = newScene.objs?.filter({ obj in
-//                    !self.seenObjs.contains(obj.objId)
-//                })
-//
-//                self.scene = newScene
-//            case .failure(let error):
-//                print("Error: \(error)")
-//            }
-//        }
+        self.refreshViews()
+        
+        if
+            let objs = scene.objs,
+            objs.count > 0
+        {
+            if synthesizer.isSpeaking {
+                currentItemIndex = -1
+                // read item after finish current reading
+            } else {
+                currentItemIndex = 0
+                readCurrentSceneItem()
+            }
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                self.requestScene()
+            }
+        }
     }
     
     // MARK: - Audio
@@ -157,6 +172,7 @@ final class GlanceViewController: UIViewController {
     
     func readCurrentSceneItem() {
         if currentItemIndex >= scene?.objs?.count ?? 0 {
+            requestScene()
             return
         }
         
@@ -174,6 +190,7 @@ final class GlanceViewController: UIViewController {
     private func readText(text: String) {
         let speechUtterance = AVSpeechUtterance(string: text)
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
+//        synthesizer.stopSpeaking(at: .immediate)
         synthesizer.speak(speechUtterance)
     }
     
@@ -182,6 +199,7 @@ final class GlanceViewController: UIViewController {
     @objc func threeFingerSwipeDownGestureHandler() {
         let fixationViewController = FixationViewController()
         fixationViewController.modalPresentationStyle = .fullScreen
+        fixationViewController.fromScene = scene
         present(fixationViewController, animated: true, completion: nil)
     }
     
@@ -192,17 +210,18 @@ final class GlanceViewController: UIViewController {
             synthesizer.continueSpeaking()
         }
         
-        guard let audioPlayer = fixedPromptAudioPlayer else { return }
-        if audioPlayer.isPlaying {
-            audioPlayer.pause()
-        } else if audioPlayer.currentTime < audioPlayer.duration {
-            audioPlayer.play()
-        }
+//        guard let audioPlayer = fixedPromptAudioPlayer else { return }
+//        if audioPlayer.isPlaying {
+//            audioPlayer.pause()
+//        } else if audioPlayer.currentTime < audioPlayer.duration {
+//            audioPlayer.play()
+//        }
     }
     
     @objc func swipeGestureHandler(_ sender: UISwipeGestureRecognizer) {
         guard
             let selectedItemIndex = selectedItemIndex,
+            selectedItemIndex < scene?.objs?.count ?? 0,
             let item = scene?.objs?[selectedItemIndex]
         else {
             // no item selected
@@ -210,9 +229,23 @@ final class GlanceViewController: UIViewController {
         }
         
         if sender.direction == .up {
-            showToast(message: "\(item.objName) 已标记为喜欢")
+            timer?.invalidate()
+            readText(text: "您已标记喜欢")
+//            showToast(message: "\(item.objName) 已标记为喜欢")
+            NetworkRequester.postLikeGlanceItem(
+                objId: item.objId,
+                like: 1, completion: { _ in
+                    
+                })
         } else if sender.direction == .down {
-            showToast(message: "\(item.objName) 已标记为不感兴趣")
+            timer?.invalidate()
+            readText(text: "您已选择不感兴趣")
+//            showToast(message: "\(item.objName) 已标记为不感兴趣")
+            NetworkRequester.postLikeGlanceItem(
+                objId: item.objId,
+                like: 1, completion: { _ in
+                    
+                })
         }
     }
 }
@@ -261,7 +294,10 @@ extension GlanceViewController: AVAudioPlayerDelegate {
 
 extension GlanceViewController: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        blockView.isHidden = true
+        
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
             self.currentItemIndex += 1
             self.readCurrentSceneItem()
         }
