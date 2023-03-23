@@ -31,6 +31,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private var isMarking: Bool = false
     private var labeledObjIds: Set<Int> = []
     private var pendingDismiss = false
+    private var isBack = false
     
     // timer
     private var timer: Timer?
@@ -69,12 +70,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 let fromScene = self.fromScene,
                 !fromScene.sceneId.hasSuffix("_1")
             {
-                self.parseAndRenderSubScene()
+                self.parseAndRenderSubScene(sceneId: fromScene.sceneId)
             } else {
                 self.parseAndRenderMainScene()
             }
             self.isRootScene = true
-            self.readSceneName()
+//            self.readSceneName()
         }
     }
     
@@ -87,7 +88,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     // MARK: - View
     
     private func setupBackgroundImageView() {
-        NetworkRequester.requestFixationImage(sceneId: fromScene?.sceneId ?? "") { image in
+        NetworkRequester.requestFixationImage(sceneId: scene?.sceneId ?? fromScene?.sceneId ?? "") { image in
             print("image!")
             self.backgroundImageView.image = image
         }
@@ -258,7 +259,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             // return to root scene
             isRootScene = true
             parseAndRenderMainScene()
-            readText(text: "为您返回\(scene?.sceneName ?? "")")
+            self.isBack = true
+//            readText(text: "为您返回\(scene?.sceneName ?? "")")
         }
     }
     
@@ -286,8 +288,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         
         if (!(item.sceneId?.isEmpty ?? true)) {
             isRootScene = false
-            parseAndRenderSubScene()
-            readSceneName()
+            parseAndRenderSubScene(sceneId: item.sceneId ?? "")
+//            readSceneName()
         }
     }
     
@@ -352,6 +354,9 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         } else {
             readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")标签")
             
+            labeledObjIds.insert(item.objId)
+            lastTouchedView?.displayDot()
+            
             self.createLabel(
                 objectID: item.objId,
                 objectName: item.objName,
@@ -371,30 +376,52 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func readSceneName() {
-        readText(text: "欢迎探索\(scene?.sceneName ?? "")")
-    }
-    
-    // MARK: - Data
-    
-    private func parseSceneFromJSON(mock: String) {
-        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
-            do {
-                let data = try Data(contentsOf: url)
-                let decoder = JSONDecoder()
-                scene = try decoder.decode(Scene.self, from: data)
-            } catch {
-                print("Error parsing JSON: \(error)")
+        if self.isBack {
+            if scene?.sceneName != nil {
+                readText(text: "为您返回\(scene?.sceneName ?? "")")
+            }
+            self.isBack = false
+        }
+        else {
+            if scene?.sceneName != nil {
+                readText(text: "欢迎探索\(scene?.sceneName ?? "")")
             }
         }
     }
     
+    // MARK: - Data
+    
+    private func parseSceneFromJSON(mock: String, sceneId: String) {
+//        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
+//            do {
+//                let data = try Data(contentsOf: url)
+//                let decoder = JSONDecoder()
+//                scene = try decoder.decode(Scene.self, from: data)
+//            } catch {
+//                print("Error parsing JSON: \(error)")
+//            }
+//        }
+        
+        NetworkRequester.postFixationData (
+            sceneId: sceneId, completion: { result in
+            switch result {
+            case .success(let sceneResponse):
+                self.scene = sceneResponse
+                self.renderFixationItemViews()
+                self.readSceneName()
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        })
+    }
+    
     private func parseAndRenderMainScene() {
-        parseSceneFromJSON(mock: "fixation_mock")
+        parseSceneFromJSON(mock: "fixation_mock", sceneId: fromScene?.sceneId ?? "")
         renderFixationItemViews()
     }
     
-    private func parseAndRenderSubScene() {
-        parseSceneFromJSON(mock: "fixation_subscene_mock")
+    private func parseAndRenderSubScene(sceneId: String) {
+        parseSceneFromJSON(mock: "fixation_subscene_mock", sceneId: sceneId)
         renderFixationItemViews()
     }
     
