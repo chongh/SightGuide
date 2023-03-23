@@ -234,11 +234,12 @@ extension MemoryViewController: AVSpeechSynthesizerDelegate {
                     sceneID: data?.data[indexPath.section].sceneId ?? "",
                     labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
                     recordName: recordName)
-            } else {
-                AudioHelper.playRecording(
-                    sceneID: data?.data[indexPath.section].sceneId ?? "",
-                    objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
             }
+//            else {
+//                AudioHelper.playRecording(
+//                    sceneID: data?.data[indexPath.section].sceneId ?? "",
+//                    objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
+//            }
         } else if let indexPath = indexPathPendingExpand {
             let fixationViewController = FixationViewController()
             fixationViewController.fromScene = data?.data[indexPath.section]

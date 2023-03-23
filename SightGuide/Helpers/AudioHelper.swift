@@ -44,6 +44,15 @@ final class AudioHelper {
     static func endRecording() {
         guard let recorder = audioRecorder else { return }
         recorder.stop()
+        
+        // for fix test machine not reading
+        let recordingSession = AVAudioSession.sharedInstance()
+        do {
+            try recordingSession.setCategory(.playback, mode: .default)
+            try recordingSession.setActive(true)
+        } catch {
+            print("Failed to start recording: \(error.localizedDescription)")
+        }
     }
     
     static func playRecording(sceneID: String, objectID: Int) {
