@@ -173,6 +173,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
 //            self.readLastTouchedView()
 //        }
         self.readLastTouchedView()
+        var action = "INPUT Fixation Touch "
+        action += itemView.item?.objName ?? ""
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     private func cancelFocusedItemView() {
@@ -188,6 +195,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
         synthesizer.speak(speechUtterance)
+        var action = "OUTPUT Fixation ReadText "
+        action += text
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     private func setupAudioPlayer() {
@@ -255,6 +269,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             readText(text: "您已回到边走边听")
         }
         pendingDismiss = true
+        var action = "INPUT Fixation BackToGlance"
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     private func setupPanGesture() {
@@ -361,6 +381,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             parseAndRenderMainScene()
             self.isBack = true
 //            readText(text: "为您返回\(scene?.sceneName ?? "")")
+            var action = "INPUT Fixation BackToMain"
+            NetworkRequester.requestCreateLog(
+                action: action,
+                completion: { result in
+                    print(result)
+                })
         }
     }
     
@@ -431,6 +457,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         if(!(item.sceneId?.isEmpty ?? true)) {
             isRootScene = false
             parseAndRenderSubScene(sceneId: item.sceneId ?? "")
+            var action = "INPUT Fixation EnterSubScene"
+            NetworkRequester.requestCreateLog(
+                action: action,
+                completion: { result in
+                    print(result)
+                })
         }
     }
     
@@ -469,6 +501,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         
         isMarking = true
         readText(text: "您已标记，继续长按可录音添加标签")
+        var action = "INPUT Fixation LabelStart"
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     func endMarkFocusedItemView() {
@@ -491,6 +529,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             lastTouchedView?.displayDot()
             
             uploadLabelVoice(objectID: item.objId, objectName: item.objName, objectText: item.text)
+            var action = "INPUT Fixation RecordFinish "
+            action += item.objName
+            NetworkRequester.requestCreateLog(
+                action: action,
+                completion: { result in
+                    print(result)
+                })
         } else {
             readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) || labeledEmptyObjIds.contains(item.objId) ? "修改" : "制作")标签")
             
@@ -506,6 +551,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 objectName: item.objName,
                 objectText: item.text,
                 recordName: nil)
+            var action = "INPUT Fixation LabelFinish "
+            action += item.objName
+            NetworkRequester.requestCreateLog(
+                action: action,
+                completion: { result in
+                    print(result)
+                })
         }
     }
     
@@ -518,6 +570,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         AudioHelper.startRecording(
             sceneID: scene?.sceneId ?? "",
             objectID: item.objId)
+        var action = "INPUT Fixation RecordStart"
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     private func readSceneName() {

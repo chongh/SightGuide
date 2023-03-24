@@ -75,7 +75,12 @@ final class GlanceViewController: UIViewController {
         }
         
         requestScene()
-        
+        var action = "INPUT Glance Enter"
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -255,6 +260,7 @@ final class GlanceViewController: UIViewController {
         objText += "有"
         objText += item.objName
         readText(text: objText)
+        
     }
     
     private func readText(text: String) {
@@ -263,6 +269,13 @@ final class GlanceViewController: UIViewController {
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
 //        synthesizer.stopSpeaking(at: .immediate)
         synthesizer.speak(speechUtterance)
+        var action = "OUTPUT Glance ReadText "
+        action += text
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
     private func getPosition(angle1: Double, angle2: Double, angle3: Double) -> String {
@@ -310,6 +323,12 @@ final class GlanceViewController: UIViewController {
         timer?.invalidate()
         refreshTimer?.invalidate()
         present(fixationViewController, animated: true, completion: nil)
+        var action = "INPUT Fixation Enter"
+        NetworkRequester.requestCreateLog(
+            action: action,
+            completion: { result in
+                print(result)
+            })
     }
     
 //    @objc func clickGestureHandler() {
@@ -414,6 +433,13 @@ final class GlanceViewController: UIViewController {
                 like: 1, completion: { _ in
                     
                 })
+            var action = "INPUT Glance Like "
+            action += item.objName
+            NetworkRequester.requestCreateLog(
+                action: action,
+                completion: { result in
+                    print(result)
+                })
             self.selectedItemIndex = nil
         } else if sender.direction == .down {
             timer?.invalidate()
@@ -425,6 +451,13 @@ final class GlanceViewController: UIViewController {
                 objId: item.objId,
                 like: -1, completion: { _ in
                     
+                })
+            var action = "INPUT Glance Dislike "
+            action += item.objName
+            NetworkRequester.requestCreateLog(
+                action: action,
+                completion: { result in
+                    print(result)
                 })
             self.selectedItemIndex = nil
         }

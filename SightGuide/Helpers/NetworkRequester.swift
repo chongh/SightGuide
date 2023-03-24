@@ -123,6 +123,28 @@ final class NetworkRequester {
             completion: completion)
     }
     
+    static func requestCreateLog(
+        action: String,
+        completion: @escaping (Result<CommonResponse, APIError>) -> Void)
+    {
+        let urlString = "/common/log"
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let dateString = dateFormatter.string(from: Date())
+        
+        var params: [String: Any] = [
+            "time": dateString,
+            "action": action,
+        ]
+        
+        performRequest(
+            urlString: urlString,
+            method: .post,
+            bodyParams: params,
+            completion: completion)
+    }
+    
     // MARK: - Memory
     
     static func requestMemoryLabels(completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {

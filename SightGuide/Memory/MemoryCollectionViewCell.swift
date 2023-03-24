@@ -28,6 +28,14 @@ final class MemoryCollectionViewCell: UICollectionViewCell {
         innerView.cell = self
     }
     
+    func setStandardBorder() {
+        innerView.layer.borderWidth = 2
+    }
+    
+    func setThickenedBorder() {
+        innerView.layer.borderWidth = 5
+    }
+    
     // MARK: - Gestures
     
     private func configureDoubleTapGesture() {
