@@ -91,6 +91,7 @@ final class NetworkRequester {
         sceneName: String,
         objectID: Int,
         objectName: String,
+        objectText: String,
         recordName: String?,
         completion: @escaping (Result<CreateLabelResponse, APIError>) -> Void)
     {
@@ -105,6 +106,7 @@ final class NetworkRequester {
             "scene_name": sceneName,
             "obj_id": objectID,
             "obj_name": objectName,
+            "obj_text": objectText,
             "time": dateString
         ]
         
@@ -129,7 +131,8 @@ final class NetworkRequester {
     static func requestLabelAudioAndPlay(
         sceneID: String,
         labelID: Int,
-        recordName: String)
+        recordName: String,
+        completion: @escaping (URL?) -> Void)
     {
         let params: [String: Any] = [
             "scene_id": sceneID,
@@ -137,7 +140,7 @@ final class NetworkRequester {
             "record_name": recordName
         ]
         
-        requestAudioAndPlay(urlString: "/memory/label_voice", queryParameters: params)
+        requestAudio(urlString: "/memory/label_voice", queryParameters: params, completion: completion)
     }
     
     // MARK: - Common
@@ -246,9 +249,10 @@ final class NetworkRequester {
         task.resume()
     }
     
-    static func requestAudioAndPlay(
+    static func requestAudio(
         urlString: String,
-        queryParameters: [String: Any]? = nil)
+        queryParameters: [String: Any]? = nil,
+        completion: @escaping (URL?) -> Void)
     {
         guard let urlComponents = URLComponents(string: BaseURL + urlString) else {
             print("Invalid base URL")
@@ -271,7 +275,10 @@ final class NetworkRequester {
         
         let task = URLSession.shared.downloadTask(with: request) { localURL, response, error in
             if let localURL = localURL {
-                AudioHelper.playFile(url: localURL)
+//                AudioHelper.playFile(url: localURL)
+                DispatchQueue.main.async {
+                    completion(localURL)
+                }
             } else if let error = error {
                 print("Error downloading audio file: \(error)")
             }

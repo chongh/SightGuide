@@ -19,6 +19,8 @@ final class FixationItemView: UIView {
         super.awakeFromNib()
         
         dotView.layer.cornerRadius = 5
+        dotView.layer.borderWidth = 2
+        dotView.layer.borderColor = UIColor.red.cgColor
         setStandardBorder()
     }
     
@@ -32,6 +34,12 @@ final class FixationItemView: UIView {
     
     func displayDot() {
         dotView.isHidden = false
+        dotView.layer.backgroundColor = UIColor.red.cgColor
+    }
+    
+    func displayEmptyDot() {
+        dotView.isHidden = false
+        dotView.layer.backgroundColor = UIColor.white.withAlphaComponent(0).cgColor
     }
     
     func renderSceneItem(item: SceneItem)
@@ -50,6 +58,11 @@ final class FixationItemView: UIView {
         }
         
         dotView.isHidden = item.labelId == nil
+        if item.isRecord == nil {
+            dotView.layer.backgroundColor = UIColor.white.withAlphaComponent(0).cgColor
+        } else {
+            dotView.layer.backgroundColor = UIColor.red.cgColor
+        }
     }
     
     class func loadFromNib() -> FixationItemView {

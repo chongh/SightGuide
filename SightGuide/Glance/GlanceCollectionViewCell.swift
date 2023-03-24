@@ -18,7 +18,7 @@ final class GlanceCollectionViewCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        configureDoubleTapGesture()
+//        configureDoubleTapGesture()
     }
     
     func renderSceneItem(item: SceneItem)
@@ -28,12 +28,12 @@ final class GlanceCollectionViewCell: UICollectionViewCell {
         borderView.backgroundColor = Specs.colorOfItemType(type: item.type)
     }
     
-    private func configureDoubleTapGesture() {
-        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellDoubleTapped))
-        doubleTapGesture.numberOfTapsRequired = 2
-        self.addGestureRecognizer(doubleTapGesture)
-    }
-    
+//    private func configureDoubleTapGesture() {
+//        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(cellDoubleTapped))
+//        doubleTapGesture.numberOfTapsRequired = 2
+//        self.addGestureRecognizer(doubleTapGesture)
+//    }
+//
     @objc private func cellDoubleTapped() {
         doubleTapAction?()
     }

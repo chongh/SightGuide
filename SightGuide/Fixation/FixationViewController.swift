@@ -30,8 +30,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     public var isFromLabel: Bool = false
     private var isMarking: Bool = false
     private var labeledObjIds: Set<Int> = []
+    private var labeledEmptyObjIds: Set<Int> = []
     private var pendingDismiss = false
     private var isBack = false
+    private var isFirst = true
     
     // timer
     private var timer: Timer?
@@ -139,6 +141,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                     fixationItemView.displayDot()
                 }
                 
+                if labeledEmptyObjIds.contains(obj.objId){
+                    fixationItemView.displayEmptyDot()
+                }
+                
                 fixationItemView.isHidden = false
             } else {
                 fixationItemView.isHidden = true
@@ -153,7 +159,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         
         beepAudioPlayer?.play()
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
             self.readLastTouchedView()
         }
     }
@@ -168,6 +174,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func readText(text: String) {
         let speechUtterance = AVSpeechUtterance(string: text)
+        speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
         synthesizer.speak(speechUtterance)
     }
@@ -187,8 +194,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private func readLastTouchedView() {
         var text = lastTouchedView?.item?.objName ?? ""
         if isFromLabel {
-            text += lastTouchedView?.item?.labelId == nil ? "无" : "有"
-            text += "标签"
+            text += lastTouchedView?.item?.labelId == nil ? "无" : "已"
+            text += "标记"
+            text += lastTouchedView?.item?.isRecord == true ? "有" : "无"
+            text += "录音"
         }
         readText(text: text)
     }
@@ -204,14 +213,17 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func setupSwipeGesture() {
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
-        swipeGesture.direction = .up
+        swipeGesture.direction = .left
         swipeGesture.numberOfTouchesRequired = 3
         swipeGesture.delegate = self
         view.addGestureRecognizer(swipeGesture)
     }
     
     @objc func handleThreeFingerSwipeUpGesture() {
-        dismiss(animated: true, completion: nil)
+        if isFromLabel == false{
+            readText(text: "您已回到边走边听")
+        }
+        pendingDismiss = true
     }
     
     private func setupPanGesture() {
@@ -252,8 +264,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         if isRootScene {
             if isFromLabel {
                 readText(text: "为您返回标签目录")
-//                pendingDismiss = true
-                dismiss(animated: true, completion: nil)
+                pendingDismiss = true
+//                dismiss(animated: true, completion: nil)
             }
         } else {
             // return to root scene
@@ -268,7 +280,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         if let itemView = sender.view as? FixationItemView {
             if
                 isFromLabel,
-                itemView.item?.labelId != nil
+                itemView.item?.labelId != nil,
+                itemView.item?.isRecord == true
             {
                 AudioHelper.playRecording(
                     sceneID: scene?.sceneId ?? "",
@@ -345,21 +358,30 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         if AudioHelper.isRecording() {
             AudioHelper.endRecording()
             
-            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
+            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) || labeledEmptyObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
+            
+            if labeledEmptyObjIds.contains(item.objId){
+                labeledEmptyObjIds.remove(item.objId)
+            }
             
             labeledObjIds.insert(item.objId)
             lastTouchedView?.displayDot()
             
-            uploadLabelVoice(objectID: item.objId, objectName: item.objName)
+            uploadLabelVoice(objectID: item.objId, objectName: item.objName, objectText: item.text)
         } else {
-            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) ? "修改" : "制作")标签")
+            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) || labeledEmptyObjIds.contains(item.objId) ? "修改" : "制作")标签")
             
-            labeledObjIds.insert(item.objId)
-            lastTouchedView?.displayDot()
+            if labeledObjIds.contains(item.objId){
+                labeledObjIds.remove(item.objId)
+            }
+            
+            labeledEmptyObjIds.insert(item.objId)
+            lastTouchedView?.displayEmptyDot()
             
             self.createLabel(
                 objectID: item.objId,
                 objectName: item.objName,
+                objectText: item.text,
                 recordName: nil)
         }
     }
@@ -385,6 +407,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         else {
             if scene?.sceneName != nil {
                 readText(text: "欢迎探索\(scene?.sceneName ?? "")")
+            }
+            if self.isFirst{
+                readText(text: "请将手机横向放置")
+                self.isFirst = false
             }
         }
     }
@@ -425,7 +451,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         renderFixationItemViews()
     }
     
-    private func uploadLabelVoice(objectID: Int, objectName: String) {
+    private func uploadLabelVoice(objectID: Int, objectName: String, objectText: String) {
         NetworkRequester.requestUploadLabelVoice(
             sceneID: scene?.sceneId ?? "",
             objectID: objectID) { recordName, error in
@@ -437,6 +463,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 self.createLabel(
                     objectID: objectID,
                     objectName: objectName,
+                    objectText: objectText,
                     recordName: recordName)
             }
     }
@@ -444,6 +471,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private func createLabel(
         objectID: Int,
         objectName: String,
+        objectText: String,
         recordName: String?)
     {
         NetworkRequester.requestCreateLabel(
@@ -451,6 +479,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             sceneName: self.scene?.sceneName ?? "",
             objectID: objectID,
             objectName: objectName,
+            objectText: objectText,
             recordName: recordName ?? "",
             completion: { result in
                 print(result)

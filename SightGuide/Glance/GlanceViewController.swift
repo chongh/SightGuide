@@ -21,6 +21,8 @@ final class GlanceViewController: UIViewController {
     // audio
     private var fixedPromptAudioPlayer: AVAudioPlayer?
     private let synthesizer = AVSpeechSynthesizer()
+    private var isFirst = true
+    private var voiceDelayTime: Double? = nil
     
     // data
     private var scene: Scene?
@@ -30,6 +32,7 @@ final class GlanceViewController: UIViewController {
     
     // timer
     private var timer: Timer?
+    private var refreshTimer : Timer?
     
     init() {
         super.init(nibName: "GlanceViewController", bundle: nil)
@@ -53,7 +56,9 @@ final class GlanceViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        playFixedPrompt()
+        if isFirst{
+            playFixedPrompt()
+        }
         
         requestScene()
         
@@ -64,6 +69,8 @@ final class GlanceViewController: UIViewController {
         
         fixedPromptAudioPlayer?.pause()
         synthesizer.pauseSpeaking(at: .immediate)
+        timer?.invalidate()
+        refreshTimer?.invalidate()
     }
     
     func refreshViews() {
@@ -94,8 +101,12 @@ final class GlanceViewController: UIViewController {
         swipeDownGesture.direction = .down
         view.addGestureRecognizer(swipeDownGesture)
     }
-    
+        
     private func setupDoubleTapGesture() {
+        let doubleClickGesture = UITapGestureRecognizer(target: self, action: #selector(doubleClickGestureHandler))
+        doubleClickGesture.numberOfTapsRequired = 2
+        view.addGestureRecognizer(doubleClickGesture)
+        
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapWithTwoFingersGestureHandler))
         doubleTapGesture.numberOfTapsRequired = 2
         doubleTapGesture.numberOfTouchesRequired = 2
@@ -144,20 +155,24 @@ final class GlanceViewController: UIViewController {
         self.scene = scene
         
         self.refreshViews()
-        
+        refreshTimer?.invalidate()
         if
             let objs = scene.objs,
             objs.count > 0
         {
             if synthesizer.isSpeaking {
                 currentItemIndex = -1
+                print("is speaking")
                 // read item after finish current reading
             } else {
                 currentItemIndex = 0
                 readCurrentSceneItem()
             }
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+//                self.requestScene()
+//            }
+            refreshTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
                 self.requestScene()
             }
         }
@@ -167,6 +182,8 @@ final class GlanceViewController: UIViewController {
     
     func playFixedPrompt() {
         //        fixedPromptAudioPlayer?.play()
+        isFirst = false
+        self.voiceDelayTime = 1
         readText(text: "单指双击物体，上滑为标记喜欢，下滑为不感兴趣")
     }
     
@@ -189,6 +206,7 @@ final class GlanceViewController: UIViewController {
     
     private func readText(text: String) {
         let speechUtterance = AVSpeechUtterance(string: text)
+        speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
 //        synthesizer.stopSpeaking(at: .immediate)
         synthesizer.speak(speechUtterance)
@@ -200,9 +218,17 @@ final class GlanceViewController: UIViewController {
         let fixationViewController = FixationViewController()
         fixationViewController.modalPresentationStyle = .fullScreen
         fixationViewController.fromScene = scene
+        timer?.invalidate()
+        refreshTimer?.invalidate()
         present(fixationViewController, animated: true, completion: nil)
     }
     
+    @objc func doubleClickGestureHandler() {
+        if self.currentItemIndex >= 0 {
+            self.selectedItemIndex = self.currentItemIndex
+        }
+    }
+
     @objc func doubleTapWithTwoFingersGestureHandler() {
         if synthesizer.isSpeaking {
             synthesizer.pauseSpeaking(at: .immediate)
@@ -230,6 +256,7 @@ final class GlanceViewController: UIViewController {
         
         if sender.direction == .up {
             timer?.invalidate()
+            self.voiceDelayTime = 1
             readText(text: "您已标记喜欢")
 //            showToast(message: "\(item.objName) 已标记为喜欢")
             NetworkRequester.postLikeGlanceItem(
@@ -237,8 +264,10 @@ final class GlanceViewController: UIViewController {
                 like: 1, completion: { _ in
                     
                 })
+            self.selectedItemIndex = nil
         } else if sender.direction == .down {
             timer?.invalidate()
+            self.voiceDelayTime = 1
             readText(text: "您已选择不感兴趣")
 //            showToast(message: "\(item.objName) 已标记为不感兴趣")
             NetworkRequester.postLikeGlanceItem(
@@ -246,6 +275,7 @@ final class GlanceViewController: UIViewController {
                 like: 1, completion: { _ in
                     
                 })
+            self.selectedItemIndex = nil
         }
     }
 }
@@ -260,9 +290,11 @@ extension GlanceViewController: UICollectionViewDataSource
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellReuseID, for: indexPath) as! GlanceCollectionViewCell
         if let sceneItem = scene?.objs?[indexPath.item] {
             cell.renderSceneItem(item: sceneItem)
-            cell.doubleTapAction = { [weak self] in
-                self?.selectedItemIndex = indexPath.item
-            }
+//            self.selectedItemIndex = indexPath.item
+//            cell.doubleTapAction = { [weak self] in
+//                self?.selectedItemIndex = indexPath.item
+//            }
+//            }
         }
         return cell
     }
@@ -297,9 +329,10 @@ extension GlanceViewController: AVSpeechSynthesizerDelegate {
         blockView.isHidden = true
         
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: self.voiceDelayTime ?? 3, repeats: false) { _ in
             self.currentItemIndex += 1
             self.readCurrentSceneItem()
+            self.voiceDelayTime = nil
         }
     }
 }

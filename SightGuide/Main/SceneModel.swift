@@ -30,6 +30,7 @@ struct SceneItem: Codable {
     let position: Position?
     let sceneId: String?
     var labelId: Int?
+    var isRecord: Bool?
     
     enum CodingKeys: String, CodingKey {
         case objId = "obj_id"
@@ -40,6 +41,7 @@ struct SceneItem: Codable {
         case position
         case sceneId = "scene_id"
         case labelId = "label_id"
+        case isRecord = "is_record"
     }
 }
 
@@ -50,12 +52,14 @@ struct Position: Codable {
 struct Label: Codable {
     let labelId: Int
     let labelName: String
+    let labelText: String
     let duration: Int
     let recordName: String?
     
     enum CodingKeys: String, CodingKey {
         case labelId = "label_id"
         case labelName = "label_name"
+        case labelText = "label_text"
         case duration
         case recordName = "record_name"
     }

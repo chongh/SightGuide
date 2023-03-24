@@ -89,10 +89,12 @@ final class MemoryViewController: UIViewController {
                 {
                     lastSelectedIndexPath = indexPath
                     
+                    self.synthesizer.stopSpeaking(at: .immediate)
+                    AudioHelper.audioPlayer?.stop()
                     beepAudioPlayer?.play()
                     
                     timer?.invalidate()
-                    timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { _ in
+                    timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                         self.readMemory(indexPath: indexPath)
                     }
                 }
@@ -153,12 +155,16 @@ final class MemoryViewController: UIViewController {
     
     private func readText(text: String) {
         let speechUtterance = AVSpeechUtterance(string: text)
+        speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
         synthesizer.speak(speechUtterance)
     }
     
     private func readMemory(indexPath: IndexPath) {
         readText(text: data?.data[indexPath.section].labels?[indexPath.item].labelName ?? "")
+        if data?.data[indexPath.section].labels?[indexPath.item].duration ?? 0 == 0{
+            readText(text: data?.data[indexPath.section].labels?[indexPath.item].labelText ?? "")
+        }
     }
 }
 
@@ -233,7 +239,12 @@ extension MemoryViewController: AVSpeechSynthesizerDelegate {
                 NetworkRequester.requestLabelAudioAndPlay(
                     sceneID: data?.data[indexPath.section].sceneId ?? "",
                     labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
-                    recordName: recordName)
+                    recordName: recordName) { localURL in
+                        if self.lastSelectedIndexPath == indexPath,
+                        let localURL = localURL {
+                            AudioHelper.playFile(url: localURL)
+                        }
+                    }
             }
 //            else {
 //                AudioHelper.playRecording(
