@@ -20,7 +20,9 @@ enum APIError: Error {
     case parsingFailed
 }
 
-private let BaseURL = "http://192.168.3.38:8080"
+private let BaseURL = "http://192.168.42.6:8080"
+//private let BaseURL = "http://192.168.3.38:8080"
+
 
 final class NetworkRequester {
     
