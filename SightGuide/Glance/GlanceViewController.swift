@@ -30,6 +30,11 @@ final class GlanceViewController: UIViewController {
     private var currentItemIndex = -1
     private var selectedItemIndex: Int? = nil
     
+    // gesture
+    private var pressStartLocation: CGPoint? = nil
+    private var pressStartTime: TimeInterval?
+    private var isLongPress = false
+    
     // timer
     private var timer: Timer?
     private var refreshTimer : Timer?
@@ -49,6 +54,7 @@ final class GlanceViewController: UIViewController {
         
         setupViewController()
         setupAudioPlayer()
+        setupPressGesture()
         setupSwipeGesture()
         setupDoubleTapGesture()
     }
@@ -103,14 +109,22 @@ final class GlanceViewController: UIViewController {
     }
         
     private func setupDoubleTapGesture() {
-        let doubleClickGesture = UITapGestureRecognizer(target: self, action: #selector(doubleClickGestureHandler))
-        doubleClickGesture.numberOfTapsRequired = 2
-        view.addGestureRecognizer(doubleClickGesture)
+//        let clickGesture = UITapGestureRecognizer(target: self, action: #selector(clickGestureHandler))
+//        clickGesture.numberOfTapsRequired = 1
+//        view.addGestureRecognizer(clickGesture)
         
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapWithTwoFingersGestureHandler))
         doubleTapGesture.numberOfTapsRequired = 2
         doubleTapGesture.numberOfTouchesRequired = 2
         view.addGestureRecognizer(doubleTapGesture)
+    }
+    
+    private func setupPressGesture() {
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureHandler))
+        longPressGestureRecognizer.numberOfTouchesRequired = 1
+        longPressGestureRecognizer.minimumPressDuration = 0.5
+        longPressGestureRecognizer.cancelsTouchesInView = false
+        view.addGestureRecognizer(longPressGestureRecognizer)
     }
     
     private func setupAudioPlayer() {
@@ -184,7 +198,7 @@ final class GlanceViewController: UIViewController {
         //        fixedPromptAudioPlayer?.play()
         isFirst = false
         self.voiceDelayTime = 1
-        readText(text: "单指双击物体，上滑为标记喜欢，下滑为不感兴趣")
+        readText(text: "单指长按物体，上滑为标记喜欢，下滑为不感兴趣")
     }
     
     func readCurrentSceneItem() {
@@ -223,12 +237,76 @@ final class GlanceViewController: UIViewController {
         present(fixationViewController, animated: true, completion: nil)
     }
     
-    @objc func doubleClickGestureHandler() {
-        if self.currentItemIndex >= 0 {
-            self.selectedItemIndex = self.currentItemIndex
+//    @objc func clickGestureHandler() {
+//        if self.currentItemIndex >= 0 {
+//            self.selectedItemIndex = self.currentItemIndex
+//        }
+//    }
+
+    @objc func longPressGestureHandler(_ sender: UILongPressGestureRecognizer) {
+        let currentLocation = sender.location(in: view)
+        if sender.state == .began {
+            print("press start")
+            print(currentLocation)
+            pressStartLocation = currentLocation
+            pressStartTime = Date().timeIntervalSince1970
+            isLongPress = true
+        }
+//        else if sender.state == .changed{
+//            guard let pressStartTime = pressStartTime else {return}
+//            if Date().timeIntervalSince1970 - pressStartTime > 0.5 {
+//                isLongPress = true
+//            } else {
+//                self.pressStartTime = Date().timeIntervalSince1970
+//            }
+//        }
+        else if sender.state == .ended {
+            print("press end")
+            if isLongPress{
+                print(currentLocation)
+                selectedItemIndex = currentItemIndex
+                guard
+                    let selectedItemIndex = selectedItemIndex,
+                    selectedItemIndex < scene?.objs?.count ?? 0,
+                    let item = scene?.objs?[selectedItemIndex],
+                    let y = pressStartLocation?.y
+                else {
+                    // no item selected
+                    return
+                }
+                if currentLocation.y - y > 100 {
+                    // down
+                    timer?.invalidate()
+                    self.voiceDelayTime = 1
+                    readText(text: "您已选择不感兴趣")
+        //            showToast(message: "\(item.objName) 已标记为不感兴趣")
+                    NetworkRequester.postLikeGlanceItem(
+                        objId: item.objId,
+                        like: 1, completion: { _ in
+                            
+                        })
+                }
+                else if currentLocation.y - y < -100
+                {
+                    // up
+                    timer?.invalidate()
+                    self.voiceDelayTime = 1
+                    readText(text: "您已标记喜欢")
+        //            showToast(message: "\(item.objName) 已标记为喜欢")
+                    NetworkRequester.postLikeGlanceItem(
+                        objId: item.objId,
+                        like: 1, completion: { _ in
+                            
+                        })
+                }
+            }
+            pressStartTime = nil
+            pressStartLocation = nil
+            isLongPress = false
+            selectedItemIndex = nil
         }
     }
-
+    
     @objc func doubleTapWithTwoFingersGestureHandler() {
         if synthesizer.isSpeaking {
             synthesizer.pauseSpeaking(at: .immediate)
@@ -245,6 +323,7 @@ final class GlanceViewController: UIViewController {
     }
     
     @objc func swipeGestureHandler(_ sender: UISwipeGestureRecognizer) {
+        print("swipe")
         guard
             let selectedItemIndex = selectedItemIndex,
             selectedItemIndex < scene?.objs?.count ?? 0,
@@ -329,7 +408,7 @@ extension GlanceViewController: AVSpeechSynthesizerDelegate {
         blockView.isHidden = true
         
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: self.voiceDelayTime ?? 3, repeats: false) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: self.voiceDelayTime ?? 10, repeats: false) { _ in
             self.currentItemIndex += 1
             self.readCurrentSceneItem()
             self.voiceDelayTime = nil

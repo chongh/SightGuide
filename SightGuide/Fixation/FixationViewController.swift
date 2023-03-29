@@ -40,10 +40,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private var timer: Timer?
     private var lastDoubleTapTimestamp: TimeInterval?
     
-    // gestures
-    private var doubleTapGestureRecognizer: UITapGestureRecognizer?
-    private var doubleTapDoubleFingerGestureRecognizer: UITapGestureRecognizer?
-    
     init() {
         super.init(nibName: "FixationViewController", bundle: nil)
     }
@@ -113,12 +109,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
 //            doubleTapGestureRecognizer.numberOfTapsRequired = 2
 //            fixationItemView.addGestureRecognizer(doubleTapGestureRecognizer)
 //
-            let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
-            fixationItemView.addGestureRecognizer(singleTapGestureRecognizer)
-            guard let doubleTapGestureRecognizer = self.doubleTapGestureRecognizer else { return }
-            guard let doubleTapDoubleFingerGestureRecognizer = self.doubleTapDoubleFingerGestureRecognizer else { return }
-            singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
-            singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
+//            let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
+//            fixationItemView.addGestureRecognizer(singleTapGestureRecognizer)
+//            guard let doubleTapGestureRecognizer = self.doubleTapGestureRecognizer else { return }
+//            guard let doubleTapDoubleFingerGestureRecognizer = self.doubleTapDoubleFingerGestureRecognizer else { return }
+//            singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
+//            singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
         }
     }
     
@@ -165,11 +161,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         itemView.setThickenedBorder()
         lastTouchedView = itemView
         
+        self.synthesizer.stopSpeaking(at: .immediate)
         beepAudioPlayer?.play()
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-            self.readLastTouchedView()
-        }
+//        timer?.invalidate()
+//        timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+//            self.readLastTouchedView()
+//        }
+        self.readLastTouchedView()
     }
     
     private func cancelFocusedItemView() {
@@ -217,16 +215,24 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         setupSwipeGesture()
         setupTwoFingerSwipeLeftGesture()
         setupMarkGestures()
-        setupDoubleTapGesture()
+        setupTapGesture()
     }
 
-    private func setupDoubleTapGesture() {
-        doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapItemViewGesture))
-        guard let doubleTapGestureRecognizer = doubleTapGestureRecognizer else {return}
+    private func setupTapGesture() {
+        let doubleTapDoubleFingerGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
+        doubleTapDoubleFingerGestureRecognizer.numberOfTapsRequired = 1
+        doubleTapDoubleFingerGestureRecognizer.numberOfTouchesRequired = 2
+        view.addGestureRecognizer(doubleTapDoubleFingerGestureRecognizer)
+        
+        let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapItemViewGesture))
         doubleTapGestureRecognizer.numberOfTapsRequired = 2
         view.addGestureRecognizer(doubleTapGestureRecognizer)
-        guard let doubleTapDoubleFingerGestureRecognizer = doubleTapDoubleFingerGestureRecognizer else {return}
         doubleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
+        
+        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
+        view.addGestureRecognizer(singleTapGestureRecognizer)
+        singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
+        singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
     }
     
     private func setupSwipeGesture() {
@@ -297,8 +303,28 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
-    @objc func handleTapItemViewGesture(_ sender: UITapGestureRecognizer) {
-        if let itemView = sender.view as? FixationItemView {
+//    @objc func handleTapItemViewGesture(_ sender: UITapGestureRecognizer) {
+//        if let itemView = sender.view as? FixationItemView {
+//            if
+//                isFromLabel,
+//                itemView.item?.labelId != nil,
+//                itemView.item?.isRecord == true
+//            {
+//                AudioHelper.playRecording(
+//                    sceneID: scene?.sceneId ?? "",
+//                    objectID: itemView.item?.objId ?? 0)
+//            } else {
+//                if self.lastTouchedView == itemView{
+//                    readText(text: itemView.item?.text ?? "")
+//                }
+//            }
+//        }
+//    }
+
+    @objc func handleTapItemViewGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+        let touchLocation = gestureRecognizer.location(in: view)
+
+        if let itemView = self.lastTouchedView {
             if
                 isFromLabel,
                 itemView.item?.labelId != nil,
@@ -308,14 +334,19 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                     sceneID: scene?.sceneId ?? "",
                     objectID: itemView.item?.objId ?? 0)
             } else {
-                if self.lastTouchedView == itemView{
-                    readText(text: itemView.item?.text ?? "")
+                readText(text: itemView.item?.text ?? "")
+            }
+        } else {
+            if let fixationItemView = view.hitTest(touchLocation, with: nil) as? FixationItemView {
+                if tmpView != fixationItemView {
+                    setFocusedItemView(itemView: fixationItemView)
+                    tmpView = fixationItemView
                 }
             }
         }
     }
     
-    @objc func handleDoubleTapItemViewGesture(_ sender: UITapGestureRecognizer) {
+    @objc func handleDoubleTapItemViewGesture() {
 //        guard
 //            isRootScene,
 //            let itemView = sender.view as? FixationItemView,
@@ -343,12 +374,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func setupMarkGestures() {
-        self.doubleTapDoubleFingerGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
-        guard let doubleTapDoubleFingerGestureRecognizer = doubleTapDoubleFingerGestureRecognizer else { return }
-        doubleTapDoubleFingerGestureRecognizer.numberOfTapsRequired = 1
-        doubleTapDoubleFingerGestureRecognizer.numberOfTouchesRequired = 2
-        view.addGestureRecognizer(doubleTapDoubleFingerGestureRecognizer)
-        
         let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleDoubleLongPressGesture))
         longPressGestureRecognizer.numberOfTouchesRequired = 2
         longPressGestureRecognizer.minimumPressDuration = 1
