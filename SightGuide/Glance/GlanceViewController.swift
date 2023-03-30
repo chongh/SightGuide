@@ -7,6 +7,7 @@
 
 import AVFoundation
 import UIKit
+import CoreLocation
 
 private let CellReuseID = "GlanceCell"
 
@@ -39,6 +40,11 @@ final class GlanceViewController: UIViewController {
     private var timer: Timer?
     private var refreshTimer : Timer?
     
+    // motion
+    let locationManager = CLLocationManager()
+    private var currentAngle: Double = 0
+    private var initAngle: Double = 0
+
     init() {
         super.init(nibName: "GlanceViewController", bundle: nil)
     }
@@ -57,6 +63,7 @@ final class GlanceViewController: UIViewController {
         setupPressGesture()
         setupSwipeGesture()
         setupDoubleTapGesture()
+        setupLocationManager()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -140,6 +147,12 @@ final class GlanceViewController: UIViewController {
         synthesizer.delegate = self
     }
     
+    private func setupLocationManager() {
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingHeading()
+    }
+    
     // MARK: - Data
     
     func requestScene() {
@@ -165,6 +178,7 @@ final class GlanceViewController: UIViewController {
     }
     
     private func updateScene(_ scene: Scene) {
+        initAngle = currentAngle
         selectedItemIndex = nil
         self.scene = scene
         
@@ -215,7 +229,11 @@ final class GlanceViewController: UIViewController {
         selectedItemIndex = nil
         
         guard let item = scene?.objs?[currentItemIndex] else { return }
-        readText(text: item.text)
+//        readText(text: item.text)
+        var objText = getPosition(angle1: item.angle, angle2: currentAngle, angle3: initAngle)
+        objText += "有"
+        objText += item.objName
+        readText(text: objText)
     }
     
     private func readText(text: String) {
@@ -224,6 +242,43 @@ final class GlanceViewController: UIViewController {
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
 //        synthesizer.stopSpeaking(at: .immediate)
         synthesizer.speak(speechUtterance)
+    }
+    
+    private func getPosition(angle1: Double, angle2: Double, angle3: Double) -> String {
+        var deltaAngle = angle2 - angle3
+        if deltaAngle < -180 {
+            deltaAngle = deltaAngle + 360
+        } else if deltaAngle > 180 {
+            deltaAngle = deltaAngle - 360
+        }
+        
+        var objAngle = angle1 - deltaAngle
+        if objAngle < -180 {
+            objAngle = objAngle + 360
+        } else if objAngle > 180 {
+            objAngle = objAngle - 360
+        }
+        
+        if objAngle < -157.5 {
+            return "后方"
+        } else if objAngle < -112.5 {
+            return "左后方"
+        } else if objAngle < -67.5 {
+            return "左边"
+        } else if objAngle < -22.5 {
+            return "左前方"
+        } else if objAngle < 22.5 {
+            return "前方"
+        } else if objAngle < 67.5 {
+            return "右前方"
+        } else if objAngle < 112.5 {
+            return "右边"
+        } else if objAngle < 157.5 {
+            return "右后方"
+        } else {
+            return "后方"
+        }
+        return "未知"
     }
     
     // MARK: - Actions
@@ -246,8 +301,6 @@ final class GlanceViewController: UIViewController {
     @objc func longPressGestureHandler(_ sender: UILongPressGestureRecognizer) {
         let currentLocation = sender.location(in: view)
         if sender.state == .began {
-            print("press start")
-            print(currentLocation)
             pressStartLocation = currentLocation
             pressStartTime = Date().timeIntervalSince1970
             isLongPress = true
@@ -261,9 +314,7 @@ final class GlanceViewController: UIViewController {
 //            }
 //        }
         else if sender.state == .ended {
-            print("press end")
             if isLongPress{
-                print(currentLocation)
                 selectedItemIndex = currentItemIndex
                 guard
                     let selectedItemIndex = selectedItemIndex,
@@ -413,5 +464,17 @@ extension GlanceViewController: AVSpeechSynthesizerDelegate {
             self.readCurrentSceneItem()
             self.voiceDelayTime = nil
         }
+    }
+}
+
+extension GlanceViewController: CLLocationManagerDelegate {
+    // 定位成功
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        currentAngle = newHeading.magneticHeading
+    }
+
+    // 定位失败
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error.localizedDescription)
     }
 }

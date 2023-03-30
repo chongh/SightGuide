@@ -7,14 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2CD0BA8229D193E9003D30E7 /* water.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA7A29D193E8003D30E7 /* water.wav */; };
-		2CD0BA8329D193E9003D30E7 /* ducks.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA7B29D193E8003D30E7 /* ducks.wav */; };
-		2CD0BA8429D193E9003D30E7 /* children.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA7C29D193E8003D30E7 /* children.wav */; };
-		2CD0BA8529D193E9003D30E7 /* car.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA7D29D193E8003D30E7 /* car.wav */; };
-		2CD0BA8629D193E9003D30E7 /* bicycle.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA7E29D193E8003D30E7 /* bicycle.wav */; };
-		2CD0BA8729D193E9003D30E7 /* dogs.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA7F29D193E9003D30E7 /* dogs.wav */; };
-		2CD0BA8829D193E9003D30E7 /* birds.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA8029D193E9003D30E7 /* birds.wav */; };
-		2CD0BA8929D193E9003D30E7 /* cats.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2CD0BA8129D193E9003D30E7 /* cats.wav */; };
 		6ADE702129C53C7200A3A84B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702029C53C7200A3A84B /* AppDelegate.swift */; };
 		6ADE702329C53C7200A3A84B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702229C53C7200A3A84B /* SceneDelegate.swift */; };
 		6ADE702529C53C7200A3A84B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702429C53C7200A3A84B /* MainViewController.swift */; };
@@ -53,14 +45,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2CD0BA7A29D193E8003D30E7 /* water.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = water.wav; sourceTree = "<group>"; };
-		2CD0BA7B29D193E8003D30E7 /* ducks.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ducks.wav; sourceTree = "<group>"; };
-		2CD0BA7C29D193E8003D30E7 /* children.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = children.wav; sourceTree = "<group>"; };
-		2CD0BA7D29D193E8003D30E7 /* car.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = car.wav; sourceTree = "<group>"; };
-		2CD0BA7E29D193E8003D30E7 /* bicycle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bicycle.wav; sourceTree = "<group>"; };
-		2CD0BA7F29D193E9003D30E7 /* dogs.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = dogs.wav; sourceTree = "<group>"; };
-		2CD0BA8029D193E9003D30E7 /* birds.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = birds.wav; sourceTree = "<group>"; };
-		2CD0BA8129D193E9003D30E7 /* cats.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = cats.wav; sourceTree = "<group>"; };
 		6ADE701D29C53C7200A3A84B /* SightGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SightGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ADE702029C53C7200A3A84B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6ADE702229C53C7200A3A84B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };

@@ -20,6 +20,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private var fixationItemViews: [FixationItemView] = []
     private var lastTouchedView: FixationItemView?
     private var tmpView: FixationItemView?
+    private var lastTouchedViews: [FixationItemView] = []
     
     // audio
     private var beepAudioPlayer: AVAudioPlayer?
@@ -135,10 +136,14 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 let centerY = (obj.position?.y0 ?? 0) * scaleY * -1 + screenHeight / 2
                 let width = (obj.position?.w ?? 0) * scaleX
                 let height = (obj.position?.h ?? 0) * scaleY
+                let r = max(width, height)
                 
-                let x = centerX - width / 2
-                let y = centerY - height / 2
-                fixationItemView.frame = CGRect(x: x, y: y, width: width, height: height)
+                let x = centerX - r / 2
+                let y = centerY - r / 2
+                fixationItemView.frame = CGRect(x: x, y: y, width: r, height: r)
+                
+                fixationItemView.dotView.center.x = fixationItemView.bounds.width / 2
+                fixationItemView.dotView.center.y = fixationItemView.bounds.height / 2 - 15
                 
                 fixationItemView.renderSceneItem(item: obj)
                 if labeledObjIds.contains(obj.objId) {
@@ -204,6 +209,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             text += "标记"
             text += lastTouchedView?.item?.isRecord == true ? "有" : "无"
             text += "录音"
+        } else {
+            text += lastTouchedView?.item?.text ?? ""
         }
         readText(text: text)
     }
@@ -229,10 +236,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         view.addGestureRecognizer(doubleTapGestureRecognizer)
         doubleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
         
-        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
-        view.addGestureRecognizer(singleTapGestureRecognizer)
-        singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
-        singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
+//        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
+//        view.addGestureRecognizer(singleTapGestureRecognizer)
+//        singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
+//        singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
     }
     
     private func setupSwipeGesture() {
@@ -256,22 +263,76 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         view.addGestureRecognizer(panGestureRecognizer)
     }
     
+//    @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+//        let touchLocation = gestureRecognizer.location(in: view)
+//
+//        switch gestureRecognizer.state {
+//        case .began, .changed:
+//            if let fixationItemView = view.hitTest(touchLocation, with: nil) as? FixationItemView {
+//                if tmpView != fixationItemView {
+//                    setFocusedItemView(itemView: fixationItemView)
+//                    tmpView = fixationItemView
+//                }
+//            }
+//            else {
+//                // lose focus if move finger to outside the item view
+////                cancelFocusedItemView()
+//                tmpView = nil
+//            }
+//        case .ended, .cancelled, .failed:
+//            // won't lose focus if user's finger leave screen without moving outside the item view
+//            timer?.invalidate()
+//        default:
+//            break
+//        }
+//    }
+    
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         let touchLocation = gestureRecognizer.location(in: view)
-        
+
         switch gestureRecognizer.state {
         case .began, .changed:
-            if let fixationItemView = view.hitTest(touchLocation, with: nil) as? FixationItemView {
-                if tmpView != fixationItemView {
-                    setFocusedItemView(itemView: fixationItemView)
-                    tmpView = fixationItemView
+            lastTouchedViews.removeAll()
+            for v in fixationItemViews{
+                let convertedPoint = v.convert(touchLocation, from: view)
+                if v.point(inside: convertedPoint, with: nil),
+                   !v.isHidden {
+                    lastTouchedViews.append(v)
+                }
+            }
+            
+            if lastTouchedViews.count > 0{
+                var selectedView: FixationItemView? = nil
+                var delta: CGFloat = 99999
+                for v in lastTouchedViews{
+                    var tmpDelta = pow((v.center.x - touchLocation.x), 2);
+                    tmpDelta += pow((v.center.y - touchLocation.y), 2);
+                    if tmpDelta < delta {
+                        delta = tmpDelta
+                        selectedView = v
+                    }
+                }
+                if tmpView != selectedView {
+                    guard let selectedView = selectedView else {break}
+                    setFocusedItemView(itemView: selectedView)
+                    tmpView = selectedView
                 }
             }
             else {
-                // lose focus if move finger to outside the item view
-//                cancelFocusedItemView()
                 tmpView = nil
             }
+
+//            if let fixationItemView = view.point(inside: touchLocation, with: nil) as? FixationItemView {
+//                if tmpView != fixationItemView {
+//                    setFocusedItemView(itemView: fixationItemView)
+//                    tmpView = fixationItemView
+//                }
+//            }
+//            else {
+//                // lose focus if move finger to outside the item view
+////                cancelFocusedItemView()
+//                tmpView = nil
+//            }
         case .ended, .cancelled, .failed:
             // won't lose focus if user's finger leave screen without moving outside the item view
             timer?.invalidate()

@@ -51,11 +51,12 @@ final class FixationItemView: UIView {
         layer.borderColor = color.cgColor
 //        dotView.backgroundColor = color
         
-        if item.type == 0 {
-            layer.cornerRadius = min(bounds.width, bounds.height) / 2
-        } else {
-            layer.cornerRadius = 0
-        }
+//        if item.type == 0 {
+//            layer.cornerRadius = min(bounds.width, bounds.height) / 2
+//        } else {
+//            layer.cornerRadius = 0
+//        }
+        layer.cornerRadius = min(bounds.width, bounds.height) / 2
         
         dotView.isHidden = item.labelId == nil
         if item.isRecord == nil {
