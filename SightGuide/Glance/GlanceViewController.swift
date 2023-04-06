@@ -30,6 +30,7 @@ final class GlanceViewController: UIViewController {
     private var seenObjs: Set<Int> = []
     private var currentItemIndex = -1
     private var selectedItemIndex: Int? = nil
+    private var like = 0
     
     // gesture
     private var pressStartLocation: CGPoint? = nil
@@ -60,7 +61,7 @@ final class GlanceViewController: UIViewController {
         
         setupViewController()
         setupAudioPlayer()
-        setupPressGesture()
+//        setupPressGesture()
         setupSwipeGesture()
         setupDoubleTapGesture()
         setupLocationManager()
@@ -126,13 +127,13 @@ final class GlanceViewController: UIViewController {
         view.addGestureRecognizer(doubleTapGesture)
     }
     
-    private func setupPressGesture() {
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureHandler))
-        longPressGestureRecognizer.numberOfTouchesRequired = 1
-        longPressGestureRecognizer.minimumPressDuration = 0.5
-        longPressGestureRecognizer.cancelsTouchesInView = false
-        view.addGestureRecognizer(longPressGestureRecognizer)
-    }
+//    private func setupPressGesture() {
+//        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureHandler))
+//        longPressGestureRecognizer.numberOfTouchesRequired = 1
+//        longPressGestureRecognizer.minimumPressDuration = 0.5
+//        longPressGestureRecognizer.cancelsTouchesInView = false
+//        view.addGestureRecognizer(longPressGestureRecognizer)
+//    }
     
     private func setupAudioPlayer() {
         if let audioPath = Bundle.main.path(forResource: "glance_fixed_prompt", ofType: "m4a") {
@@ -216,6 +217,25 @@ final class GlanceViewController: UIViewController {
     }
     
     func readCurrentSceneItem() {
+        if currentItemIndex >= 1,
+        like == 0
+        {
+            self.selectedItemIndex = currentItemIndex - 1
+            guard
+                let selectedItemIndex = selectedItemIndex,
+                selectedItemIndex < scene?.objs?.count ?? 0,
+                let item = scene?.objs?[selectedItemIndex]
+            else {
+                // no item selected
+                return
+            }
+            NetworkRequester.postLikeGlanceItem(
+                objId: item.objId,
+                like: 0, completion: { _ in
+                    
+                })
+        }
+        
         if currentItemIndex >= scene?.objs?.count ?? 0 {
             requestScene()
             return
@@ -227,6 +247,7 @@ final class GlanceViewController: UIViewController {
             at: .centeredHorizontally,
             animated: true)
         selectedItemIndex = nil
+        like = 0
         
         guard let item = scene?.objs?[currentItemIndex] else { return }
 //        readText(text: item.text)
@@ -278,7 +299,6 @@ final class GlanceViewController: UIViewController {
         } else {
             return "后方"
         }
-        return "未知"
     }
     
     // MARK: - Actions
@@ -298,65 +318,59 @@ final class GlanceViewController: UIViewController {
 //        }
 //    }
 
-    @objc func longPressGestureHandler(_ sender: UILongPressGestureRecognizer) {
-        let currentLocation = sender.location(in: view)
-        if sender.state == .began {
-            pressStartLocation = currentLocation
-            pressStartTime = Date().timeIntervalSince1970
-            isLongPress = true
-        }
-//        else if sender.state == .changed{
-//            guard let pressStartTime = pressStartTime else {return}
-//            if Date().timeIntervalSince1970 - pressStartTime > 0.5 {
-//                isLongPress = true
-//            } else {
-//                self.pressStartTime = Date().timeIntervalSince1970
-//            }
+//    @objc func longPressGestureHandler(_ sender: UILongPressGestureRecognizer) {
+//        let currentLocation = sender.location(in: view)
+//        if sender.state == .began {
+//            pressStartLocation = currentLocation
+//            pressStartTime = Date().timeIntervalSince1970
+//            isLongPress = true
 //        }
-        else if sender.state == .ended {
-            if isLongPress{
-                selectedItemIndex = currentItemIndex
-                guard
-                    let selectedItemIndex = selectedItemIndex,
-                    selectedItemIndex < scene?.objs?.count ?? 0,
-                    let item = scene?.objs?[selectedItemIndex],
-                    let y = pressStartLocation?.y
-                else {
-                    // no item selected
-                    return
-                }
-                if currentLocation.y - y > 100 {
-                    // down
-                    timer?.invalidate()
-                    self.voiceDelayTime = 1
-                    readText(text: "您已选择不感兴趣")
-        //            showToast(message: "\(item.objName) 已标记为不感兴趣")
-                    NetworkRequester.postLikeGlanceItem(
-                        objId: item.objId,
-                        like: 1, completion: { _ in
-                            
-                        })
-                }
-                else if currentLocation.y - y < -100
-                {
-                    // up
-                    timer?.invalidate()
-                    self.voiceDelayTime = 1
-                    readText(text: "您已标记喜欢")
-        //            showToast(message: "\(item.objName) 已标记为喜欢")
-                    NetworkRequester.postLikeGlanceItem(
-                        objId: item.objId,
-                        like: 1, completion: { _ in
-                            
-                        })
-                }
-            }
-            pressStartTime = nil
-            pressStartLocation = nil
-            isLongPress = false
-            selectedItemIndex = nil
-        }
-    }
+//        else if sender.state == .ended {
+//            if isLongPress{
+//                selectedItemIndex = currentItemIndex
+//                guard
+//                    let selectedItemIndex = selectedItemIndex,
+//                    selectedItemIndex < scene?.objs?.count ?? 0,
+//                    let item = scene?.objs?[selectedItemIndex],
+//                    let y = pressStartLocation?.y
+//                else {
+//                    // no item selected
+//                    return
+//                }
+//                if currentLocation.y - y > 100 {
+//                    // down
+//                    timer?.invalidate()
+//                    self.voiceDelayTime = 1
+//                    readText(text: "您已选择不感兴趣")
+//                    like = -1
+//        //            showToast(message: "\(item.objName) 已标记为不感兴趣")
+//                    NetworkRequester.postLikeGlanceItem(
+//                        objId: item.objId,
+//                        like: 1, completion: { _ in
+//
+//                        })
+//                }
+//                else if currentLocation.y - y < -100
+//                {
+//                    // up
+//                    timer?.invalidate()
+//                    self.voiceDelayTime = 1
+//                    readText(text: "您已标记喜欢")
+//                    like = 1
+//        //            showToast(message: "\(item.objName) 已标记为喜欢")
+//                    NetworkRequester.postLikeGlanceItem(
+//                        objId: item.objId,
+//                        like: 1, completion: { _ in
+//
+//                        })
+//                }
+//            }
+//            pressStartTime = nil
+//            pressStartLocation = nil
+//            isLongPress = false
+//            selectedItemIndex = nil
+//        }
+//    }
     
     @objc func doubleTapWithTwoFingersGestureHandler() {
         if synthesizer.isSpeaking {
@@ -374,7 +388,12 @@ final class GlanceViewController: UIViewController {
     }
     
     @objc func swipeGestureHandler(_ sender: UISwipeGestureRecognizer) {
-        print("swipe")
+        if self.currentItemIndex >= 0{
+            self.selectedItemIndex = self.currentItemIndex
+        }
+        else {
+            return
+        }
         guard
             let selectedItemIndex = selectedItemIndex,
             selectedItemIndex < scene?.objs?.count ?? 0,
@@ -388,6 +407,7 @@ final class GlanceViewController: UIViewController {
             timer?.invalidate()
             self.voiceDelayTime = 1
             readText(text: "您已标记喜欢")
+            like = 1
 //            showToast(message: "\(item.objName) 已标记为喜欢")
             NetworkRequester.postLikeGlanceItem(
                 objId: item.objId,
@@ -399,10 +419,11 @@ final class GlanceViewController: UIViewController {
             timer?.invalidate()
             self.voiceDelayTime = 1
             readText(text: "您已选择不感兴趣")
+            like = -1
 //            showToast(message: "\(item.objName) 已标记为不感兴趣")
             NetworkRequester.postLikeGlanceItem(
                 objId: item.objId,
-                like: 1, completion: { _ in
+                like: -1, completion: { _ in
                     
                 })
             self.selectedItemIndex = nil
@@ -459,7 +480,7 @@ extension GlanceViewController: AVSpeechSynthesizerDelegate {
         blockView.isHidden = true
         
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: self.voiceDelayTime ?? 10, repeats: false) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: self.voiceDelayTime ?? 7, repeats: false) { _ in
             self.currentItemIndex += 1
             self.readCurrentSceneItem()
             self.voiceDelayTime = nil
