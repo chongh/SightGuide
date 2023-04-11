@@ -8,6 +8,7 @@
 import AVFoundation
 import UIKit
 import CoreLocation
+import os
 
 private let CellReuseID = "GlanceCell"
 
@@ -45,6 +46,9 @@ final class GlanceViewController: UIViewController {
     let locationManager = CLLocationManager()
     private var currentAngle: Double = 0
     private var initAngle: Double = 0
+    
+    // test
+    private var params: BasicParams?
 
     init() {
         super.init(nibName: "GlanceViewController", bundle: nil)
@@ -59,6 +63,7 @@ final class GlanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupBasic()
         setupViewController()
         setupAudioPlayer()
 //        setupPressGesture()
@@ -75,12 +80,9 @@ final class GlanceViewController: UIViewController {
         }
         
         requestScene()
-        var action = "INPUT Glance Enter"
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        let action = "INPUT Glance Enter"
+        LogHelper.log.info(action)
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -90,6 +92,8 @@ final class GlanceViewController: UIViewController {
         synthesizer.pauseSpeaking(at: .immediate)
         timer?.invalidate()
         refreshTimer?.invalidate()
+        locationManager.stopUpdatingHeading()
+        locationManager.stopUpdatingLocation()
     }
     
     func refreshViews() {
@@ -97,6 +101,17 @@ final class GlanceViewController: UIViewController {
     }
     
     // MARK: - Setup
+    
+    private func setupBasic() {
+        // get params
+        NetworkRequester.getParams(completion:{ result in
+            switch result {
+            case .success(let params):
+                self.params = params
+            case .failure(let error):
+                print("Error: \(error)")
+            }        })
+    }
     
     private func setupViewController() {
         collectionView.register(
@@ -155,8 +170,11 @@ final class GlanceViewController: UIViewController {
     
     private func setupLocationManager() {
         locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestAlwaysAuthorization()
+        locationManager.distanceFilter = kCLDistanceFilterNone
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingHeading()
+        locationManager.startUpdatingLocation()
     }
     
     // MARK: - Data
@@ -175,8 +193,10 @@ final class GlanceViewController: UIViewController {
                 for obj in newScene.objs ?? [] {
                     self.seenObjs.insert(obj.objId)
                 }
-
-                self.updateScene(newScene)
+                
+                if newScene.objs?.count ?? 0 > 0{
+                    self.updateScene(newScene)
+                }
             case .failure(let error):
                 print("Error: \(error)")
             }
@@ -236,7 +256,8 @@ final class GlanceViewController: UIViewController {
             }
             NetworkRequester.postLikeGlanceItem(
                 objId: item.objId,
-                like: 0, completion: { _ in
+                like: 0,
+                sceneId: scene?.sceneId, completion: { _ in
                     
                 })
         }
@@ -254,15 +275,68 @@ final class GlanceViewController: UIViewController {
         selectedItemIndex = nil
         like = 0
         
+        if currentItemIndex == 0 {
+            readText(text: "新场景开始")
+        }
+        
         guard let item = scene?.objs?[currentItemIndex] else { return }
 //        readText(text: item.text)
-        var objText = getPosition(angle1: item.angle, angle2: currentAngle, angle3: initAngle)
-        objText += "有"
-        objText += item.objName
-        readText(text: objText)
+        if let angles = item.angles,
+           angles.count > 1 {
+            var positions: [String] = []
+            for angle in angles{
+                let position = getPosition(angle1: angle, angle2: currentAngle, angle3: initAngle)
+                if !positions.contains(position) {
+                    positions.append(position)
+                }
+            }
+            if positions.count > 1 {
+                var objText = positions.joined(separator: ",")
+                var surroundCount = 0
+                if objText.contains("前") {
+                    surroundCount += 1
+                }
+                if objText.contains("后") {
+                    surroundCount += 1
+                }
+                if objText.contains("左") {
+                    surroundCount += 1
+                }
+                if objText.contains("右") {
+                    surroundCount += 1
+                }
+                if positions.count > 2,
+                   surroundCount > 2 {
+                    objText = "周围有"
+                    let name = item.processedName ?? item.objName
+                    objText += name.split(separator: "_")[0]
+                    readText(text: objText)
+                } else {
+                    objText += "都有"
+                    let name = item.processedName ?? item.objName
+                    objText += name.split(separator: "_")[0]
+                    readText(text: objText)
+                }
+
+            } else {
+                var objText = positions.joined(separator: ",")
+                objText += "有"
+                objText += item.processedName ?? item.objName
+                readText(text: objText)
+            }
+            
+        } else {
+            var objText = getPosition(angle1: item.angle, angle2: currentAngle, angle3: initAngle)
+            objText += "有"
+            objText += item.processedName ?? item.objName
+            readText(text: objText)
+        }
         
+        if self.params?.glanceType == 2{
+            requestScene()
+        }
     }
-    
+
     private func readText(text: String) {
         let speechUtterance = AVSpeechUtterance(string: text)
         speechUtterance.rate = 0.7
@@ -271,11 +345,7 @@ final class GlanceViewController: UIViewController {
         synthesizer.speak(speechUtterance)
         var action = "OUTPUT Glance ReadText "
         action += text
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        LogHelper.log.info(action)
     }
     
     private func getPosition(angle1: Double, angle2: Double, angle3: Double) -> String {
@@ -317,18 +387,16 @@ final class GlanceViewController: UIViewController {
     // MARK: - Actions
     
     @objc func threeFingerSwipeDownGestureHandler() {
+        LogHelper.log.verbose("Glance Gesture ThreeFingerSwipe")
+        
         let fixationViewController = FixationViewController()
         fixationViewController.modalPresentationStyle = .fullScreen
         fixationViewController.fromScene = scene
         timer?.invalidate()
         refreshTimer?.invalidate()
         present(fixationViewController, animated: true, completion: nil)
-        var action = "INPUT Fixation Enter"
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        let action = "INPUT Fixation Enter"
+        LogHelper.log.info(action)
     }
     
 //    @objc func clickGestureHandler() {
@@ -392,6 +460,7 @@ final class GlanceViewController: UIViewController {
 //    }
     
     @objc func doubleTapWithTwoFingersGestureHandler() {
+        LogHelper.log.verbose("Glance Gesture TwoFingersDoubleTap")
         if synthesizer.isSpeaking {
             synthesizer.pauseSpeaking(at: .immediate)
         } else {
@@ -407,6 +476,15 @@ final class GlanceViewController: UIViewController {
     }
     
     @objc func swipeGestureHandler(_ sender: UISwipeGestureRecognizer) {
+        var action = "Glance Gesture Swipe "
+        if sender.direction == .up {
+            action += "up "
+        } else if sender.direction == .down {
+            action += "down "
+        }
+        action += String(self.currentItemIndex)
+        LogHelper.log.verbose(action)
+        
         if self.currentItemIndex >= 0{
             self.selectedItemIndex = self.currentItemIndex
         }
@@ -416,7 +494,8 @@ final class GlanceViewController: UIViewController {
         guard
             let selectedItemIndex = selectedItemIndex,
             selectedItemIndex < scene?.objs?.count ?? 0,
-            let item = scene?.objs?[selectedItemIndex]
+            let item = scene?.objs?[selectedItemIndex],
+            self.like == 0
         else {
             // no item selected
             return
@@ -430,16 +509,13 @@ final class GlanceViewController: UIViewController {
 //            showToast(message: "\(item.objName) 已标记为喜欢")
             NetworkRequester.postLikeGlanceItem(
                 objId: item.objId,
-                like: 1, completion: { _ in
+                like: 1,
+                sceneId: scene?.sceneId ,completion: { _ in
                     
                 })
             var action = "INPUT Glance Like "
             action += item.objName
-            NetworkRequester.requestCreateLog(
-                action: action,
-                completion: { result in
-                    print(result)
-                })
+            LogHelper.log.info(action)
             self.selectedItemIndex = nil
         } else if sender.direction == .down {
             timer?.invalidate()
@@ -449,16 +525,13 @@ final class GlanceViewController: UIViewController {
 //            showToast(message: "\(item.objName) 已标记为不感兴趣")
             NetworkRequester.postLikeGlanceItem(
                 objId: item.objId,
-                like: -1, completion: { _ in
+                like: -1,
+                sceneId: scene?.sceneId, completion: { _ in
                     
                 })
             var action = "INPUT Glance Dislike "
             action += item.objName
-            NetworkRequester.requestCreateLog(
-                action: action,
-                completion: { result in
-                    print(result)
-                })
+            LogHelper.log.info(action)
             self.selectedItemIndex = nil
         }
     }
@@ -525,6 +598,16 @@ extension GlanceViewController: CLLocationManagerDelegate {
     // 定位成功
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         currentAngle = newHeading.magneticHeading
+        var action = "Glance Angle "
+        action += String(currentAngle)
+        LogHelper.log.verbose(action)
+    }
+    
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations.last ?? CLLocation.init()
+        var action = "Glance Location "
+        action += location.description
+        LogHelper.log.verbose(action)
     }
 
     // 定位失败

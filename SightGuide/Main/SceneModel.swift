@@ -21,6 +21,14 @@ struct Scene: Codable {
     }
 }
 
+struct BasicParams: Codable {
+    let glanceType: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case glanceType = "glance_type"
+    }
+}
+
 struct SceneItem: Codable {
     let objId: Int
     let objName: String
@@ -29,6 +37,8 @@ struct SceneItem: Codable {
     let text: String
     let position: Position?
     let sceneId: String?
+    let processedName: String?
+    let angles: [Double]?
     var labelId: Int?
     var isRecord: Bool?
     
@@ -40,6 +50,8 @@ struct SceneItem: Codable {
         case text
         case position
         case sceneId = "scene_id"
+        case processedName = "processed_unique_name"
+        case angles
         case labelId = "label_id"
         case isRecord = "is_record"
     }

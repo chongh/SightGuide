@@ -165,6 +165,10 @@ final class MemoryViewController: UIViewController {
             }
             readCurrentSceneItem()
         } else if sender.direction == .down {
+            if self.currentItemIndex == -2 {
+                // init do not handle down
+                return
+            }
             if self.currentItemIndex == -1 {
                 if self.currentSectionIndex == 0 {
                     print("begin")
@@ -202,7 +206,7 @@ final class MemoryViewController: UIViewController {
         //            }
         //        }
         
-        NetworkRequester.requestMemoryLabels { result in
+        NetworkRequester.requestMemoryLabels(userId: LogHelper.UserId) { result in
             switch result {
             case .success(let response):
                 self.data = response
@@ -227,7 +231,7 @@ final class MemoryViewController: UIViewController {
             }
         }
         
-//        synthesizer.delegate = self
+        synthesizer.delegate = self
     }
     
     private func readText(text: String) {
@@ -235,9 +239,12 @@ final class MemoryViewController: UIViewController {
         speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
         synthesizer.speak(speechUtterance)
+        LogHelper.log.info("memory" + text)
     }
     
     private func readMemory(indexPath: IndexPath) {
+        lastSelectedIndexPath = indexPath
+
         readText(text: data?.data[indexPath.section].labels?[indexPath.item].labelName ?? "")
         if data?.data[indexPath.section].labels?[indexPath.item].duration ?? 0 == 0{
             readText(text: data?.data[indexPath.section].labels?[indexPath.item].labelText ?? "")
@@ -245,6 +252,9 @@ final class MemoryViewController: UIViewController {
     }
     
     private func readCurrentSceneItem() {
+        if currentItemIndex < -1 {
+            return
+        }
         print(currentSectionIndex)
         print(currentItemIndex)
         
@@ -258,11 +268,10 @@ final class MemoryViewController: UIViewController {
             timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                 self.readText(text: self.data?.data[self.currentSectionIndex].sceneName ?? "")
             }
-            
+            lastSelectedIndexPath = nil
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID, for: IndexPath(item: currentItemIndex, section: currentSectionIndex)) as! MemoryCollectionViewCell
             print(data?.data[currentSectionIndex].labels?[currentItemIndex].labelName ?? "")
-            cell.setThickenedBorder()
             beepAudioPlayer?.play()
             
             timer?.invalidate()
@@ -337,36 +346,36 @@ extension MemoryViewController: UIGestureRecognizerDelegate {
     }
 }
 
-//extension MemoryViewController: AVSpeechSynthesizerDelegate {
-//    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-//        if let indexPath = lastSelectedIndexPath {
-//            if let recordName = data?.data[indexPath.section].labels?[indexPath.item].recordName {
-//                NetworkRequester.requestLabelAudioAndPlay(
+extension MemoryViewController: AVSpeechSynthesizerDelegate {
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        if let indexPath = lastSelectedIndexPath {
+            if let recordName = data?.data[indexPath.section].labels?[indexPath.item].recordName {
+                NetworkRequester.requestLabelAudioAndPlay(
+                    sceneID: data?.data[indexPath.section].sceneId ?? "",
+                    labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
+                    recordName: recordName) { localURL in
+                        if self.lastSelectedIndexPath == indexPath,
+                        let localURL = localURL {
+                            AudioHelper.playFile(url: localURL)
+                        }
+                    }
+            }
+//            else {
+//                AudioHelper.playRecording(
 //                    sceneID: data?.data[indexPath.section].sceneId ?? "",
-//                    labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
-//                    recordName: recordName) { localURL in
-//                        if self.lastSelectedIndexPath == indexPath,
-//                        let localURL = localURL {
-//                            AudioHelper.playFile(url: localURL)
-//                        }
-//                    }
+//                    objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
 //            }
-////            else {
-////                AudioHelper.playRecording(
-////                    sceneID: data?.data[indexPath.section].sceneId ?? "",
-////                    objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
-////            }
-//        } else if let indexPath = indexPathPendingExpand {
-//            let fixationViewController = FixationViewController()
-//            fixationViewController.fromScene = data?.data[indexPath.section]
-//            fixationViewController.isFromLabel = true
-//            fixationViewController.modalPresentationStyle = .fullScreen
-//            present(fixationViewController, animated: true, completion: nil)
-//            
-//            indexPathPendingExpand = nil
-//        }
-//    }
-//}
+        } else if let indexPath = indexPathPendingExpand {
+            let fixationViewController = FixationViewController()
+            fixationViewController.fromScene = data?.data[indexPath.section]
+            fixationViewController.isFromLabel = true
+            fixationViewController.modalPresentationStyle = .fullScreen
+            present(fixationViewController, animated: true, completion: nil)
+            
+            indexPathPendingExpand = nil
+        }
+    }
+}
 
 //extension MemoryViewController: AVSpeechSynthesizerDelegate {
 //    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

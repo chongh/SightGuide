@@ -21,8 +21,9 @@ enum APIError: Error {
 }
 
 //private let BaseURL = "http://192.168.42.6:8080"    // camera
-private let BaseURL = "http://192.168.3.38:8080"  // qy
-
+//private let BaseURL = "http://192.168.3.38:8080"  // qy
+//private let BaseURL = "http://192.168.1.19:8080"  // qy303
+private let BaseURL = "http://192.168.14.176:8080"    // air
 
 final class NetworkRequester {
     
@@ -38,12 +39,13 @@ final class NetworkRequester {
         performRequest(urlString: urlString, method: .get, completion: completion)
     }
     
-    static func postLikeGlanceItem(objId: Int, like: Int, completion: @escaping (Result<Void, APIError>) -> Void) {
+    static func postLikeGlanceItem(objId: Int, like: Int, sceneId: String?, completion: @escaping (Result<Void, APIError>) -> Void) {
         let urlString = "/glance/like"
         
         let params: [String: Any] = [
             "obj_id": objId,
-            "like": like
+            "like": like,
+            "scene_id": sceneId
         ]
         
         performRequest(urlString: urlString, method: .post, bodyParams: params) { (result: Result<CommonResponse, APIError>) in
@@ -62,12 +64,14 @@ final class NetworkRequester {
     
     // MARK: - Fixation
     
-    static func postFixationData(sceneId: String, completion: @escaping (Result<Scene, APIError>) -> Void) {
+    static func postFixationData(sceneId: String?, completion: @escaping (Result<Scene, APIError>) -> Void) {
         let urlString = "/fixation/data"
         
-        let params: [String: Any] = [
-            "scene_id": sceneId
-        ]
+        var params: [String: Any] = [:]
+        
+        if let sceneId = sceneId{
+            params["scene_id"] = sceneId
+        }
         
         performRequest(urlString: urlString, method: .post, bodyParams: params, completion: completion)
     }
@@ -95,6 +99,7 @@ final class NetworkRequester {
         objectName: String,
         objectText: String,
         recordName: String?,
+        userId: Int,
         completion: @escaping (Result<CreateLabelResponse, APIError>) -> Void)
     {
         let urlString = "/fixation/label"
@@ -109,7 +114,8 @@ final class NetworkRequester {
             "obj_id": objectID,
             "obj_name": objectName,
             "obj_text": objectText,
-            "time": dateString
+            "time": dateString,
+            "user_id": userId,
         ]
         
         if let recordName = recordName {
@@ -147,9 +153,16 @@ final class NetworkRequester {
     
     // MARK: - Memory
     
-    static func requestMemoryLabels(completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {
+    static func requestMemoryLabels(userId: Int, completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {
         let urlString = "/memory/labels"
-        performRequest(urlString: urlString, method: .get, completion: completion)
+        let params: [String: Any] = [
+            "user_id": userId,
+        ]
+        performRequest(
+            urlString: urlString,
+            method: .post,
+            bodyParams: params,
+            completion: completion)
     }
     
     static func requestLabelAudioAndPlay(
@@ -168,6 +181,10 @@ final class NetworkRequester {
     }
     
     // MARK: - Common
+    static func getParams(completion: @escaping (Result<BasicParams, APIError>) -> Void) {
+        let urlString = "/common/params"
+        performRequest(urlString: urlString, method: .get, completion: completion)
+    }
     
     static func performRequest<T: Codable>(
         urlString: String,

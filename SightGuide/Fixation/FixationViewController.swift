@@ -175,11 +175,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         self.readLastTouchedView()
         var action = "INPUT Fixation Touch "
         action += itemView.item?.objName ?? ""
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        LogHelper.log.info(action)
     }
     
     private func cancelFocusedItemView() {
@@ -197,11 +193,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         synthesizer.speak(speechUtterance)
         var action = "OUTPUT Fixation ReadText "
         action += text
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        LogHelper.log.info(action)
     }
     
     private func setupAudioPlayer() {
@@ -233,8 +225,9 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func setupGestures() {
         setupPanGesture()
-        setupSwipeGesture()
-        setupTwoFingerSwipeLeftGesture()
+//        setupSwipeGesture()
+//        setupTwoFingerSwipeLeftGesture()
+        setupLongPressGestures()
         setupMarkGestures()
         setupTapGesture()
     }
@@ -257,30 +250,60 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func setupSwipeGesture() {
-        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
-        swipeGesture.direction = .left
-        swipeGesture.numberOfTouchesRequired = 3
-        swipeGesture.delegate = self
-        view.addGestureRecognizer(swipeGesture)
+        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
+        swipeLeftGesture.direction = .left
+        swipeLeftGesture.numberOfTouchesRequired = 3
+        swipeLeftGesture.delegate = self
+        view.addGestureRecognizer(swipeLeftGesture)
+        
+        let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
+        swipeRightGesture.direction = .right
+        swipeRightGesture.numberOfTouchesRequired = 3
+        swipeRightGesture.delegate = self
+        view.addGestureRecognizer(swipeRightGesture)
     }
     
     @objc func handleThreeFingerSwipeUpGesture() {
+        LogHelper.log.verbose("Fixation Gesture ThreeFingerSwipe")
+
         if isFromLabel == false{
             readText(text: "您已回到边走边听")
         }
         pendingDismiss = true
-        var action = "INPUT Fixation BackToGlance"
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        let action = "INPUT Fixation BackToGlance"
+        LogHelper.log.info(action)
     }
     
     private func setupPanGesture() {
+        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
+        swipeLeftGesture.direction = .left
+        swipeLeftGesture.numberOfTouchesRequired = 3
+        swipeLeftGesture.delegate = self
+        view.addGestureRecognizer(swipeLeftGesture)
+        
+        let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
+        swipeRightGesture.direction = .right
+        swipeRightGesture.numberOfTouchesRequired = 3
+        swipeRightGesture.delegate = self
+        view.addGestureRecognizer(swipeRightGesture)
+        
+        let twoFingerSwipeLeftGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleTwoFingerSwipeLeftGesture))
+        twoFingerSwipeLeftGestureRecognizer.direction = .left
+        twoFingerSwipeLeftGestureRecognizer.numberOfTouchesRequired = 2
+        view.addGestureRecognizer(twoFingerSwipeLeftGestureRecognizer)
+        
+        let twoFingerSwipeRightGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleTwoFingerSwipeLeftGesture))
+        twoFingerSwipeRightGestureRecognizer.direction = .right
+        twoFingerSwipeRightGestureRecognizer.numberOfTouchesRequired = 2
+        view.addGestureRecognizer(twoFingerSwipeRightGestureRecognizer)
+        
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         panGestureRecognizer.delegate = self
         view.addGestureRecognizer(panGestureRecognizer)
+        panGestureRecognizer.require(toFail: twoFingerSwipeLeftGestureRecognizer)
+        panGestureRecognizer.require(toFail: twoFingerSwipeRightGestureRecognizer)
+        panGestureRecognizer.require(toFail: swipeLeftGesture)
+        panGestureRecognizer.require(toFail: swipeRightGesture)
     }
     
 //    @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
@@ -312,6 +335,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
 
         switch gestureRecognizer.state {
         case .began, .changed:
+            var action = "Fixation Gesture Pan "
+            action += String.init(format: "%.2f, ", touchLocation.x)
+            action += String.init(format: "%.2f", touchLocation.y)
+            LogHelper.log.verbose(action)
             lastTouchedViews.removeAll()
             for v in fixationItemViews{
                 let convertedPoint = v.convert(touchLocation, from: view)
@@ -366,9 +393,16 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         twoFingerSwipeLeftGestureRecognizer.direction = .left
         twoFingerSwipeLeftGestureRecognizer.numberOfTouchesRequired = 2
         view.addGestureRecognizer(twoFingerSwipeLeftGestureRecognizer)
+        
+        let twoFingerSwipeRightGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleTwoFingerSwipeLeftGesture))
+        twoFingerSwipeRightGestureRecognizer.direction = .right
+        twoFingerSwipeRightGestureRecognizer.numberOfTouchesRequired = 2
+        view.addGestureRecognizer(twoFingerSwipeRightGestureRecognizer)
     }
     
     @objc func handleTwoFingerSwipeLeftGesture() {
+        LogHelper.log.verbose("Fixation Gesture TwoFingerSwipe")
+
         if isRootScene {
             if isFromLabel {
                 readText(text: "为您返回标签目录")
@@ -378,15 +412,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         } else {
             // return to root scene
             isRootScene = true
-            parseAndRenderMainScene()
             self.isBack = true
+            parseAndRenderMainScene()
 //            readText(text: "为您返回\(scene?.sceneName ?? "")")
-            var action = "INPUT Fixation BackToMain"
-            NetworkRequester.requestCreateLog(
-                action: action,
-                completion: { result in
-                    print(result)
-                })
+            let action = "INPUT Fixation BackToMain"
+            LogHelper.log.info(action)
+
         }
     }
     
@@ -409,6 +440,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
 //    }
 
     @objc func handleTapItemViewGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+        LogHelper.log.verbose("Fixation Gesture Tap")
+
         let touchLocation = gestureRecognizer.location(in: view)
 
         if let itemView = self.lastTouchedView {
@@ -434,6 +467,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @objc func handleDoubleTapItemViewGesture() {
+        LogHelper.log.verbose("Fixation Gesture DoubleTap")
+
 //        guard
 //            isRootScene,
 //            let itemView = sender.view as? FixationItemView,
@@ -457,12 +492,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         if(!(item.sceneId?.isEmpty ?? true)) {
             isRootScene = false
             parseAndRenderSubScene(sceneId: item.sceneId ?? "")
-            var action = "INPUT Fixation EnterSubScene"
-            NetworkRequester.requestCreateLog(
-                action: action,
-                completion: { result in
-                    print(result)
-                })
+            let action = "INPUT Fixation EnterSubScene"
+            LogHelper.log.info(action)
         }
     }
     
@@ -489,6 +520,32 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
+    private func setupLongPressGestures() {
+        let refreshGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleRefreshGesture))
+        refreshGestureRecognizer.minimumPressDuration = 5
+        view.addGestureRecognizer(refreshGestureRecognizer)
+    }
+    
+    @objc func handleRefreshGesture(_ gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .began {
+            beepAudioPlayer?.play()
+        }
+        if gesture.state == .ended || gesture.state == .cancelled {
+            NetworkRequester.postFixationData (
+                sceneId: nil, completion: { result in
+                    switch result {
+                    case .success(let sceneResponse):
+                        self.scene = sceneResponse
+                        self.renderFixationItemViews()
+                        self.readSceneName()
+                    case .failure(let error):
+                        print("Error: \(error)")
+                    }
+                })
+            renderFixationItemViews()
+        }
+    }
+    
     // MARK: - Mark
     
     func markFocusedItemView() {
@@ -501,12 +558,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         
         isMarking = true
         readText(text: "您已标记，继续长按可录音添加标签")
-        var action = "INPUT Fixation LabelStart"
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        let action = "INPUT Fixation LabelStart"
+        LogHelper.log.info(action)
     }
     
     func endMarkFocusedItemView() {
@@ -531,11 +584,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             uploadLabelVoice(objectID: item.objId, objectName: item.objName, objectText: item.text)
             var action = "INPUT Fixation RecordFinish "
             action += item.objName
-            NetworkRequester.requestCreateLog(
-                action: action,
-                completion: { result in
-                    print(result)
-                })
+            LogHelper.log.info(action)
         } else {
             readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) || labeledEmptyObjIds.contains(item.objId) ? "修改" : "制作")标签")
             
@@ -553,11 +602,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 recordName: nil)
             var action = "INPUT Fixation LabelFinish "
             action += item.objName
-            NetworkRequester.requestCreateLog(
-                action: action,
-                completion: { result in
-                    print(result)
-                })
+            LogHelper.log.info(action)
         }
     }
     
@@ -571,11 +616,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             sceneID: scene?.sceneId ?? "",
             objectID: item.objId)
         var action = "INPUT Fixation RecordStart"
-        NetworkRequester.requestCreateLog(
-            action: action,
-            completion: { result in
-                print(result)
-            })
+        LogHelper.log.info(action)
     }
     
     private func readSceneName() {
@@ -662,6 +703,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             objectName: objectName,
             objectText: objectText,
             recordName: recordName ?? "",
+            userId: LogHelper.UserId,
             completion: { result in
                 print(result)
             })
