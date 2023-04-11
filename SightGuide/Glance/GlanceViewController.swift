@@ -78,7 +78,6 @@ final class GlanceViewController: UIViewController {
         requestScene()
         let action = "INPUT Glance Enter"
         LogHelper.log.info(action)
-
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -164,25 +163,51 @@ final class GlanceViewController: UIViewController {
     // MARK: - Data
     
     func requestScene() {
-        NetworkRequester.getScene { result in
-            switch result {
-            case .success(let sceneResponse):
-                var newScene = sceneResponse
-
+        if let url = Bundle.main.url(forResource: "glance_mock", withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: url)
+                let decoder = JSONDecoder()
+                
+                var newScene = try decoder.decode(Scene.self, from: data)
+                
+                // remove objs with duplicate ID
+                newScene.objs = newScene.objs?.filter({ obj in
+                    !seenObjs.contains(obj.objId)
+                })
                 // remove objs with duplicate ID
                 newScene.objs = newScene.objs?.filter({ obj in
                     !self.seenObjs.contains(obj.objId)
                 })
-                
+
                 for obj in newScene.objs ?? [] {
                     self.seenObjs.insert(obj.objId)
                 }
                 
+                scene = newScene
                 self.updateScene(newScene)
-            case .failure(let error):
-                print("Error: \(error)")
+            } catch {
+                print("Error parsing JSON: \(error)")
             }
         }
+//        NetworkRequester.getScene { result in
+//            switch result {
+//            case .success(let sceneResponse):
+//                var newScene = sceneResponse
+//
+//                // remove objs with duplicate ID
+//                newScene.objs = newScene.objs?.filter({ obj in
+//                    !self.seenObjs.contains(obj.objId)
+//                })
+//
+//                for obj in newScene.objs ?? [] {
+//                    self.seenObjs.insert(obj.objId)
+//                }
+//
+//                self.updateScene(newScene)
+//            case .failure(let error):
+//                print("Error: \(error)")
+//            }
+//        }
     }
     
     private func updateScene(_ scene: Scene) {
@@ -236,12 +261,12 @@ final class GlanceViewController: UIViewController {
                 // no item selected
                 return
             }
-            NetworkRequester.postLikeGlanceItem(
-                objId: item.objId,
-                like: 0,
-                sceneId: scene?.sceneId, completion: { _ in
-                    
-                })
+//            NetworkRequester.postLikeGlanceItem(
+//                objId: item.objId,
+//                like: 0,
+//                sceneId: scene?.sceneId, completion: { _ in
+//
+//                })
         }
         
         if currentItemIndex >= scene?.objs?.count ?? 0 {
@@ -492,12 +517,12 @@ final class GlanceViewController: UIViewController {
             readText(text: "您已标记喜欢")
             like = 1
 //            showToast(message: "\(item.objName) 已标记为喜欢")
-            NetworkRequester.postLikeGlanceItem(
-                objId: item.objId,
-                like: 1,
-                sceneId: scene?.sceneId ,completion: { _ in
-                    
-                })
+//            NetworkRequester.postLikeGlanceItem(
+//                objId: item.objId,
+//                like: 1,
+//                sceneId: scene?.sceneId ,completion: { _ in
+//
+//                })
             var action = "INPUT Glance Like "
             action += item.objName
             LogHelper.log.info(action)
@@ -508,12 +533,12 @@ final class GlanceViewController: UIViewController {
             readText(text: "您已选择不感兴趣")
             like = -1
 //            showToast(message: "\(item.objName) 已标记为不感兴趣")
-            NetworkRequester.postLikeGlanceItem(
-                objId: item.objId,
-                like: -1,
-                sceneId: scene?.sceneId, completion: { _ in
-                    
-                })
+//            NetworkRequester.postLikeGlanceItem(
+//                objId: item.objId,
+//                like: -1,
+//                sceneId: scene?.sceneId, completion: { _ in
+//
+//                })
             var action = "INPUT Glance Dislike "
             action += item.objName
             LogHelper.log.info(action)
@@ -571,6 +596,7 @@ extension GlanceViewController: AVSpeechSynthesizerDelegate {
         blockView.isHidden = true
         
         timer?.invalidate()
+        print(self.voiceDelayTime ?? 0)
         timer = Timer.scheduledTimer(withTimeInterval: self.voiceDelayTime ?? 7, repeats: false) { _ in
             self.currentItemIndex += 1
             self.readCurrentSceneItem()

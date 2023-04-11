@@ -93,10 +93,11 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     // MARK: - View
     
     private func setupBackgroundImageView() {
-        NetworkRequester.requestFixationImage(sceneId: scene?.sceneId ?? fromScene?.sceneId ?? "") { image in
-            print("image!")
-            self.backgroundImageView.image = image
-        }
+//        NetworkRequester.requestFixationImage(sceneId: scene?.sceneId ?? fromScene?.sceneId ?? "") { image in
+//            print("image!")
+//            self.backgroundImageView.image = image
+//        }
+        self.backgroundImageView.image = UIImage(named: "fixiation_example_background")
     }
     
     private func setupFixationItemViews() {
@@ -188,6 +189,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     // MARK: - Audio
     
     private func readText(text: String) {
+        print(text)
         let speechUtterance = AVSpeechUtterance(string: text)
         speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
@@ -418,7 +420,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
 //            readText(text: "为您返回\(scene?.sceneName ?? "")")
             let action = "INPUT Fixation BackToMain"
             LogHelper.log.info(action)
-
         }
     }
     
@@ -624,6 +625,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func readSceneName() {
+        synthesizer.stopSpeaking(at: .immediate)
         if self.isBack {
             if scene?.sceneName != nil {
                 readText(text: "为您返回\(scene?.sceneName ?? "")")
@@ -644,27 +646,29 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     // MARK: - Data
     
     private func parseSceneFromJSON(mock: String, sceneId: String) {
-//        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
-//            do {
-//                let data = try Data(contentsOf: url)
-//                let decoder = JSONDecoder()
-//                scene = try decoder.decode(Scene.self, from: data)
-//            } catch {
-//                print("Error parsing JSON: \(error)")
-//            }
-//        }
-        
-        NetworkRequester.postFixationData (
-            sceneId: sceneId, completion: { result in
-            switch result {
-            case .success(let sceneResponse):
-                self.scene = sceneResponse
+        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: url)
+                let decoder = JSONDecoder()
+                scene = try decoder.decode(Scene.self, from: data)
                 self.renderFixationItemViews()
                 self.readSceneName()
-            case .failure(let error):
-                print("Error: \(error)")
+            } catch {
+                print("Error parsing JSON: \(error)")
             }
-        })
+        }
+        
+//        NetworkRequester.postFixationData (
+//            sceneId: sceneId, completion: { result in
+//            switch result {
+//            case .success(let sceneResponse):
+//                self.scene = sceneResponse
+//                self.renderFixationItemViews()
+//                self.readSceneName()
+//            case .failure(let error):
+//                print("Error: \(error)")
+//            }
+//        })
     }
     
     private func parseAndRenderMainScene() {
@@ -678,20 +682,20 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func uploadLabelVoice(objectID: Int, objectName: String, objectText: String) {
-        NetworkRequester.requestUploadLabelVoice(
-            sceneID: scene?.sceneId ?? "",
-            objectID: objectID) { recordName, error in
-                if let error = error {
-                    print(error)
-                    return
-                }
-                
-                self.createLabel(
-                    objectID: objectID,
-                    objectName: objectName,
-                    objectText: objectText,
-                    recordName: recordName)
-            }
+//        NetworkRequester.requestUploadLabelVoice(
+//            sceneID: scene?.sceneId ?? "",
+//            objectID: objectID) { recordName, error in
+//                if let error = error {
+//                    print(error)
+//                    return
+//                }
+//
+//                self.createLabel(
+//                    objectID: objectID,
+//                    objectName: objectName,
+//                    objectText: objectText,
+//                    recordName: recordName)
+//            }
     }
     
     private func createLabel(
@@ -700,17 +704,16 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         objectText: String,
         recordName: String?)
     {
-        NetworkRequester.requestCreateLabel(
-            sceneID: self.scene?.sceneId ?? "",
-            sceneName: self.scene?.sceneName ?? "",
-            objectID: objectID,
-            objectName: objectName,
-            objectText: objectText,
-            recordName: recordName ?? "",
-            userId: LogHelper.UserId,
-            completion: { result in
-                print(result)
-            })
+//        NetworkRequester.requestCreateLabel(
+//            sceneID: self.scene?.sceneId ?? "",
+//            sceneName: self.scene?.sceneName ?? "",
+//            objectID: objectID,
+//            objectName: objectName,
+//            objectText: objectText,
+//            recordName: recordName ?? "",
+//            completion: { result in
+//                print(result)
+//            })
     }
     
     // MARK: - Landscape

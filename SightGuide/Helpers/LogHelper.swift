@@ -21,7 +21,7 @@ final class LogHelper {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: Date())
-        file.logFileURL = url.appendingPathComponent("SightGuide."+dateString+".log")
+        file.logFileURL = url.appendingPathComponent("SightGuide_demo."+dateString+".log")
         file.minLevel = SwiftyBeaver.Level.verbose
         log.addDestination(console)
         log.addDestination(file)

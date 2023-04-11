@@ -65,7 +65,7 @@
 		2C2BE59B29E7AC6C00B14392 /* Build */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Build; path = Carthage/Build; sourceTree = "<group>"; };
 		2C2BE59C29E7AC9400B14392 /* SwiftyBeaver.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftyBeaver.xcframework; path = Carthage/Build/SwiftyBeaver.xcframework; sourceTree = "<group>"; };
 		2C2BE5A029E7B49F00B14392 /* LogHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogHelper.swift; sourceTree = "<group>"; };
-		6ADE701D29C53C7200A3A84B /* SightGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SightGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6ADE701D29C53C7200A3A84B /* SightGuide1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SightGuide1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ADE702029C53C7200A3A84B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6ADE702229C53C7200A3A84B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		6ADE702429C53C7200A3A84B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 		6ADE701E29C53C7200A3A84B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6ADE701D29C53C7200A3A84B /* SightGuide.app */,
+				6ADE701D29C53C7200A3A84B /* SightGuide1.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -245,9 +245,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6ADE701C29C53C7200A3A84B /* SightGuide */ = {
+		6ADE701C29C53C7200A3A84B /* SightGuide1 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6ADE703129C53C7300A3A84B /* Build configuration list for PBXNativeTarget "SightGuide" */;
+			buildConfigurationList = 6ADE703129C53C7300A3A84B /* Build configuration list for PBXNativeTarget "SightGuide1" */;
 			buildPhases = (
 				6ADE701929C53C7200A3A84B /* Sources */,
 				6ADE701A29C53C7200A3A84B /* Frameworks */,
@@ -258,9 +258,9 @@
 			);
 			dependencies = (
 			);
-			name = SightGuide;
+			name = SightGuide1;
 			productName = SightGuide;
-			productReference = 6ADE701D29C53C7200A3A84B /* SightGuide.app */;
+			productReference = 6ADE701D29C53C7200A3A84B /* SightGuide1.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -291,7 +291,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6ADE701C29C53C7200A3A84B /* SightGuide */,
+				6ADE701C29C53C7200A3A84B /* SightGuide1 */,
 			);
 		};
 /* End PBXProject section */
@@ -512,7 +512,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = newSightGuide;
+				PRODUCT_BUNDLE_IDENTIFIER = SightGuide1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -547,7 +547,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = newSightGuide;
+				PRODUCT_BUNDLE_IDENTIFIER = SightGuide1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -568,7 +568,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6ADE703129C53C7300A3A84B /* Build configuration list for PBXNativeTarget "SightGuide" */ = {
+		6ADE703129C53C7300A3A84B /* Build configuration list for PBXNativeTarget "SightGuide1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6ADE703229C53C7300A3A84B /* Debug */,
