@@ -99,7 +99,7 @@ final class NetworkRequester {
         objectName: String,
         objectText: String,
         recordName: String?,
-        userId: Int,
+        userId: String,
         completion: @escaping (Result<CreateLabelResponse, APIError>) -> Void)
     {
         let urlString = "/fixation/label"
@@ -153,7 +153,7 @@ final class NetworkRequester {
     
     // MARK: - Memory
     
-    static func requestMemoryLabels(userId: Int, completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {
+    static func requestMemoryLabels(userId: String, completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {
         let urlString = "/memory/labels"
         let params: [String: Any] = [
             "user_id": userId,

@@ -10,7 +10,7 @@ import Foundation
 
 final class LogHelper {
     static var log = SwiftyBeaver.self
-    static var UserId = 0
+    static var UserId = "0"
     
     static func Setup() {
         let console = ConsoleDestination()

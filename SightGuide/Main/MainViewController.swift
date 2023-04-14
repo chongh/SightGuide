@@ -33,10 +33,10 @@ final class MainViewController: UIViewController {
     }
     
     @IBAction func startButtonClickedAction(_ sender: Any) {
-        LogHelper.UserId = Int(txtUserId.text ?? "0") ?? 0
+        LogHelper.UserId = txtUserId.text ?? "0"
         txtUserId.resignFirstResponder()
         txtUserId.endEditing(false)
-        LogHelper.log.info("Experiment Start For User " + String(LogHelper.UserId))
+        LogHelper.log.info("Experiment Start For User " + LogHelper.UserId)
     }
     
 }
