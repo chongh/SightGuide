@@ -36,6 +36,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private var pendingDismiss = false
     private var isBack = false
     private var isFirst = true
+    private var needPlayAudio = false
     
     // timer
     private var timer: Timer?
@@ -531,6 +532,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             beepAudioPlayer?.play()
         }
         if gesture.state == .ended || gesture.state == .cancelled {
+            sleep(LogHelper.params?.fixationWaitTime ?? 5)
             NetworkRequester.postFixationData (
                 sceneId: nil, completion: { result in
                     switch result {
@@ -582,6 +584,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             lastTouchedView?.displayDot()
             
             uploadLabelVoice(objectID: item.objId, objectName: item.objName, objectText: item.text)
+            needPlayAudio = true
             var action = "INPUT Fixation RecordFinish "
             action += item.objName
             LogHelper.log.info(action)
@@ -741,6 +744,13 @@ extension FixationViewController: AVSpeechSynthesizerDelegate {
             dismiss(animated: true, completion: nil)
         } else if isMarking {
             startRecording()
+        } else if needPlayAudio {
+            guard
+                let item = lastTouchedView?.item
+            else { return }
+            
+            AudioHelper.playRecording(sceneID: scene?.sceneId ?? "", objectID: item.objId)
+            needPlayAudio = false
         }
     }
 }

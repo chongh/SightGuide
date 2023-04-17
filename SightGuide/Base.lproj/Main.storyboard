@@ -80,6 +80,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="Sae-4A-1A6"/>
                     <connections>
+                        <outlet property="btnStart" destination="3eI-FI-hzr" id="1YL-ST-ybq"/>
                         <outlet property="txtUserId" destination="GAm-3T-Tw0" id="Ptf-2J-b23"/>
                     </connections>
                 </viewController>

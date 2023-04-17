@@ -47,9 +47,6 @@ final class GlanceViewController: UIViewController {
     private var currentAngle: Double = 0
     private var initAngle: Double = 0
     
-    // test
-    private var params: BasicParams?
-
     init() {
         super.init(nibName: "GlanceViewController", bundle: nil)
     }
@@ -63,7 +60,6 @@ final class GlanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupBasic()
         setupViewController()
         setupAudioPlayer()
 //        setupPressGesture()
@@ -101,18 +97,6 @@ final class GlanceViewController: UIViewController {
     }
     
     // MARK: - Setup
-    
-    private func setupBasic() {
-        // get params
-        NetworkRequester.getParams(completion:{ result in
-            switch result {
-            case .success(let params):
-                self.params = params
-            case .failure(let error):
-                print("Error: \(error)")
-            }        })
-    }
-    
     private func setupViewController() {
         collectionView.register(
             UINib(
@@ -332,7 +316,7 @@ final class GlanceViewController: UIViewController {
             readText(text: objText)
         }
         
-        if self.params?.glanceType == 2{
+        if LogHelper.params?.glanceType == 2{
             requestScene()
         }
     }

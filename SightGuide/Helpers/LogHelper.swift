@@ -11,8 +11,10 @@ import Foundation
 final class LogHelper {
     static var log = SwiftyBeaver.self
     static var UserId = "0"
+    static var params: BasicParams?
     
     static func Setup() {
+        // init log
         let console = ConsoleDestination()
         let file = FileDestination()
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -20,5 +22,14 @@ final class LogHelper {
         file.minLevel = SwiftyBeaver.Level.verbose
         log.addDestination(console)
         log.addDestination(file)
+        
+        // get params
+        NetworkRequester.getParams(completion:{ result in
+            switch result {
+            case .success(let params):
+                self.params = params
+            case .failure(let error):
+                print("Error: \(error)")
+            }        })
     }
 }

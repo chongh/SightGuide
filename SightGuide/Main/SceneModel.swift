@@ -23,9 +23,11 @@ struct Scene: Codable {
 
 struct BasicParams: Codable {
     let glanceType: Int
+    let fixationWaitTime: UInt32
     
     enum CodingKeys: String, CodingKey {
         case glanceType = "glance_type"
+        case fixationWaitTime = "fixation_wait_time"
     }
 }
 

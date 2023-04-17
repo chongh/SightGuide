@@ -9,6 +9,7 @@ import UIKit
 
 final class MainViewController: UIViewController {
     @IBOutlet weak var txtUserId: UITextField!
+    @IBOutlet weak var btnStart: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +38,11 @@ final class MainViewController: UIViewController {
         txtUserId.resignFirstResponder()
         txtUserId.endEditing(false)
         LogHelper.log.info("Experiment Start For User " + LogHelper.UserId)
+        if btnStart.tintColor == .blue {
+            btnStart.tintColor = .red
+        } else {
+            btnStart.tintColor = .blue
+        }
     }
     
 }
