@@ -559,7 +559,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         }
         
         isMarking = true
-        readText(text: "您已标记，继续长按可录音添加标签")
+        readText(text: "您已标记，继续长按可录音添加标签!滴")
         let action = "INPUT Fixation LabelStart"
         LogHelper.log.info(action)
     }

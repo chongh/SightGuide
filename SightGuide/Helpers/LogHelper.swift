@@ -18,7 +18,10 @@ final class LogHelper {
         let console = ConsoleDestination()
         let file = FileDestination()
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        file.logFileURL = url.appendingPathComponent("SightGuide.log")
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: Date())
+        file.logFileURL = url.appendingPathComponent("SightGuide."+dateString+".log")
         file.minLevel = SwiftyBeaver.Level.verbose
         log.addDestination(console)
         log.addDestination(file)

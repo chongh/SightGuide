@@ -178,9 +178,7 @@ final class GlanceViewController: UIViewController {
                     self.seenObjs.insert(obj.objId)
                 }
                 
-                if newScene.objs?.count ?? 0 > 0{
-                    self.updateScene(newScene)
-                }
+                self.updateScene(newScene)
             case .failure(let error):
                 print("Error: \(error)")
             }
@@ -210,7 +208,7 @@ final class GlanceViewController: UIViewController {
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
 //                self.requestScene()
 //            }
-            refreshTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+            refreshTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 self.requestScene()
             }
         }
