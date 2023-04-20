@@ -20,10 +20,10 @@ enum APIError: Error {
     case parsingFailed
 }
 
-//private let BaseURL = "http://192.168.42.6:8080"    // camera
+private let BaseURL = "http://192.168.42.6:8080"    // camera
 //private let BaseURL = "http://192.168.3.38:8080"  // qy
 //private let BaseURL = "http://192.168.1.19:8080"  // qy303
-private let BaseURL = "http://192.168.14.176:8080"    // air
+//private let BaseURL = "http://192.168.14.176:8080"    // air
 
 final class NetworkRequester {
     

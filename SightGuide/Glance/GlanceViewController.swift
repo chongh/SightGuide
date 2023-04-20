@@ -220,7 +220,7 @@ final class GlanceViewController: UIViewController {
         //        fixedPromptAudioPlayer?.play()
         isFirst = false
         self.voiceDelayTime = 1
-        readText(text: "单指长按物体，上滑为标记喜欢，下滑为不感兴趣")
+        readText(text: "上滑为标记喜欢，下滑为不感兴趣")
     }
     
     func readCurrentSceneItem() {
@@ -332,6 +332,9 @@ final class GlanceViewController: UIViewController {
     
     private func getPosition(angle1: Double, angle2: Double, angle3: Double) -> String {
         var deltaAngle = angle2 - angle3
+        if LogHelper.params?.imuEnable == 0 {
+            deltaAngle = 0
+        }
         if deltaAngle < -180 {
             deltaAngle = deltaAngle + 360
         } else if deltaAngle > 180 {

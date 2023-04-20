@@ -552,12 +552,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     func markFocusedItemView() {
         guard
-            lastTouchedView != nil,
-            lastTouchedView?.item?.type != 0
+            lastTouchedView != nil
+//            lastTouchedView?.item?.type != 0
         else {
             return
         }
         
+        synthesizer.stopSpeaking(at: .immediate)
         isMarking = true
         readText(text: "您已标记，继续长按可录音添加标签!滴")
         let action = "INPUT Fixation LabelStart"
@@ -634,7 +635,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 readText(text: "欢迎探索\(scene?.sceneName ?? "")")
             }
             if self.isFirst{
-                readText(text: "请将手机横向放置")
+                readText(text: "请将手机横向放置，听筒向左")
                 self.isFirst = false
             }
         }
