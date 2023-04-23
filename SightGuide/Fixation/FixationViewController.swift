@@ -635,7 +635,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
                 readText(text: "欢迎探索\(scene?.sceneName ?? "")")
             }
             if self.isFirst{
-                readText(text: "请将手机横向放置，听筒向左")
+                readText(text: "请将手机横向放置，声音向右")
                 self.isFirst = false
             }
         }
