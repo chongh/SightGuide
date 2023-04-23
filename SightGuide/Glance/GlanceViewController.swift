@@ -163,7 +163,7 @@ final class GlanceViewController: UIViewController {
     // MARK: - Data
     
     func requestScene() {
-        if let url = Bundle.main.url(forResource: "glance_mock", withExtension: "json") {
+        if let url = Bundle.main.url(forResource: LogHelper.UserId + "/glance_mock", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
                 let decoder = JSONDecoder()
@@ -244,7 +244,7 @@ final class GlanceViewController: UIViewController {
     func playFixedPrompt() {
         //        fixedPromptAudioPlayer?.play()
         isFirst = false
-        self.voiceDelayTime = 1
+        self.voiceDelayTime = 7
         readText(text: "上滑为标记喜欢，下滑为不感兴趣")
     }
     

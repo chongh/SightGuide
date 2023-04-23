@@ -10,6 +10,8 @@
 		2C2BE59D29E7AC9500B14392 /* SwiftyBeaver.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C2BE59C29E7AC9400B14392 /* SwiftyBeaver.xcframework */; };
 		2C2BE59E29E7AC9500B14392 /* SwiftyBeaver.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2C2BE59C29E7AC9400B14392 /* SwiftyBeaver.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C2BE5A129E7B49F00B14392 /* LogHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2BE5A029E7B49F00B14392 /* LogHelper.swift */; };
+		2C91B65E29F0EA8A00E84FA5 /* Demo in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B65D29F0EA8A00E84FA5 /* Demo */; };
+		2C91B66829F635C700E84FA5 /* 1 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B66729F635C700E84FA5 /* 1 */; };
 		6ADE702129C53C7200A3A84B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702029C53C7200A3A84B /* AppDelegate.swift */; };
 		6ADE702329C53C7200A3A84B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702229C53C7200A3A84B /* SceneDelegate.swift */; };
 		6ADE702529C53C7200A3A84B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702429C53C7200A3A84B /* MainViewController.swift */; };
@@ -26,19 +28,14 @@
 		6ADE704B29C54FC800A3A84B /* GlanceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE704A29C54FC800A3A84B /* GlanceViewController.xib */; };
 		6ADE704E29C5A5C800A3A84B /* GlanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE704C29C5A5C800A3A84B /* GlanceCollectionViewCell.swift */; };
 		6ADE704F29C5A5C800A3A84B /* GlanceCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE704D29C5A5C800A3A84B /* GlanceCollectionViewCell.xib */; };
-		6ADE705129C5ABB300A3A84B /* glance_mock.json in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE705029C5ABB300A3A84B /* glance_mock.json */; };
 		6ADE705329C5AC4B00A3A84B /* SceneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE705229C5AC4B00A3A84B /* SceneModel.swift */; };
 		6ADE705629C5BE3800A3A84B /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE705529C5BE3800A3A84B /* Toast.swift */; };
 		6ADE705829C5C5EC00A3A84B /* FixationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE705729C5C5EC00A3A84B /* FixationViewController.xib */; };
 		6ADE705A29C5CA4800A3A84B /* NavigationTopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE705929C5CA4800A3A84B /* NavigationTopViewController.swift */; };
 		6ADE705C29C5DD2A00A3A84B /* FixationItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE705B29C5DD2A00A3A84B /* FixationItemView.swift */; };
 		6ADE705E29C5DD4100A3A84B /* FixationItemView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE705D29C5DD4100A3A84B /* FixationItemView.xib */; };
-		6ADE706229C5DF9400A3A84B /* fixation_mock.json in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE706129C5DF9400A3A84B /* fixation_mock.json */; };
-		6ADE706429C5E96300A3A84B /* fixiation_example_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE706329C5E96300A3A84B /* fixiation_example_background.png */; };
 		6ADE706629C5EA7700A3A84B /* Specs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE706529C5EA7700A3A84B /* Specs.swift */; };
 		6ADE706829C5EEEF00A3A84B /* beep.wav in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE706729C5EEEF00A3A84B /* beep.wav */; };
-		6ADE706A29C692E200A3A84B /* fixation_subscene_mock.json in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE706929C692E200A3A84B /* fixation_subscene_mock.json */; };
-		6ADE706C29C6C8C600A3A84B /* memory_mock.json in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE706B29C6C8C600A3A84B /* memory_mock.json */; };
 		6ADE706F29C6CB9B00A3A84B /* MemoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE706D29C6CB9B00A3A84B /* MemoryCollectionViewCell.swift */; };
 		6ADE707029C6CB9B00A3A84B /* MemoryCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ADE706E29C6CB9B00A3A84B /* MemoryCollectionViewCell.xib */; };
 		6ADE707329C73D3900A3A84B /* MemorySectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE707129C73D3900A3A84B /* MemorySectionHeaderView.swift */; };
@@ -65,6 +62,8 @@
 		2C2BE59B29E7AC6C00B14392 /* Build */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Build; path = Carthage/Build; sourceTree = "<group>"; };
 		2C2BE59C29E7AC9400B14392 /* SwiftyBeaver.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftyBeaver.xcframework; path = Carthage/Build/SwiftyBeaver.xcframework; sourceTree = "<group>"; };
 		2C2BE5A029E7B49F00B14392 /* LogHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogHelper.swift; sourceTree = "<group>"; };
+		2C91B65D29F0EA8A00E84FA5 /* Demo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Demo; path = SightGuide/Resources/Demo; sourceTree = "<group>"; };
+		2C91B66729F635C700E84FA5 /* 1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 1; sourceTree = "<group>"; };
 		6ADE701D29C53C7200A3A84B /* SightGuide1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SightGuide1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ADE702029C53C7200A3A84B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6ADE702229C53C7200A3A84B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -90,11 +89,11 @@
 		6ADE705929C5CA4800A3A84B /* NavigationTopViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTopViewController.swift; sourceTree = "<group>"; };
 		6ADE705B29C5DD2A00A3A84B /* FixationItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixationItemView.swift; sourceTree = "<group>"; };
 		6ADE705D29C5DD4100A3A84B /* FixationItemView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FixationItemView.xib; sourceTree = "<group>"; };
-		6ADE706129C5DF9400A3A84B /* fixation_mock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fixation_mock.json; sourceTree = "<group>"; };
-		6ADE706329C5E96300A3A84B /* fixiation_example_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fixiation_example_background.png; sourceTree = "<group>"; };
+		6ADE706129C5DF9400A3A84B /* fixation_mock_1_1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fixation_mock_1_1.json; sourceTree = "<group>"; };
+		6ADE706329C5E96300A3A84B /* fixiation_example_background_1_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fixiation_example_background_1_1.png; sourceTree = "<group>"; };
 		6ADE706529C5EA7700A3A84B /* Specs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Specs.swift; sourceTree = "<group>"; };
 		6ADE706729C5EEEF00A3A84B /* beep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = beep.wav; sourceTree = "<group>"; };
-		6ADE706929C692E200A3A84B /* fixation_subscene_mock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fixation_subscene_mock.json; sourceTree = "<group>"; };
+		6ADE706929C692E200A3A84B /* fixation_mock_1_100.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = fixation_mock_1_100.json; sourceTree = "<group>"; };
 		6ADE706B29C6C8C600A3A84B /* memory_mock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = memory_mock.json; sourceTree = "<group>"; };
 		6ADE706D29C6CB9B00A3A84B /* MemoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		6ADE706E29C6CB9B00A3A84B /* MemoryCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemoryCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -125,9 +124,24 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		2C91B65C29F0E4BC00E84FA5 /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				6ADE704629C5497400A3A84B /* glance_fixed_prompt.m4a */,
+				6ADE706329C5E96300A3A84B /* fixiation_example_background_1_1.png */,
+				6ADE705029C5ABB300A3A84B /* glance_mock.json */,
+				6ADE706129C5DF9400A3A84B /* fixation_mock_1_1.json */,
+				6ADE706929C692E200A3A84B /* fixation_mock_1_100.json */,
+				6ADE706B29C6C8C600A3A84B /* memory_mock.json */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
 		6ADE701429C53C7200A3A84B = {
 			isa = PBXGroup;
 			children = (
+				2C91B66729F635C700E84FA5 /* 1 */,
+				2C91B65D29F0EA8A00E84FA5 /* Demo */,
 				6ADE701F29C53C7200A3A84B /* SightGuide */,
 				6ADE701E29C53C7200A3A84B /* Products */,
 				2C2BE59A29E7AC6B00B14392 /* Frameworks */,
@@ -218,13 +232,8 @@
 		6ADE704529C5497400A3A84B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2C91B65C29F0E4BC00E84FA5 /* Demo */,
 				6ADE706729C5EEEF00A3A84B /* beep.wav */,
-				6ADE706329C5E96300A3A84B /* fixiation_example_background.png */,
-				6ADE704629C5497400A3A84B /* glance_fixed_prompt.m4a */,
-				6ADE705029C5ABB300A3A84B /* glance_mock.json */,
-				6ADE706129C5DF9400A3A84B /* fixation_mock.json */,
-				6ADE706929C692E200A3A84B /* fixation_subscene_mock.json */,
-				6ADE706B29C6C8C600A3A84B /* memory_mock.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -301,19 +310,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C91B66829F635C700E84FA5 /* 1 in Resources */,
+				2C91B65E29F0EA8A00E84FA5 /* Demo in Resources */,
 				6ADE702D29C53C7300A3A84B /* LaunchScreen.storyboard in Resources */,
-				6ADE705129C5ABB300A3A84B /* glance_mock.json in Resources */,
 				6ADE704729C5497400A3A84B /* glance_fixed_prompt.m4a in Resources */,
-				6ADE706429C5E96300A3A84B /* fixiation_example_background.png in Resources */,
 				6ADE707429C73D3900A3A84B /* MemorySectionHeaderView.xib in Resources */,
 				6ADE706829C5EEEF00A3A84B /* beep.wav in Resources */,
 				6ADE703E29C53F0A00A3A84B /* MemoryViewController.xib in Resources */,
-				6ADE706229C5DF9400A3A84B /* fixation_mock.json in Resources */,
 				6ADE704B29C54FC800A3A84B /* GlanceViewController.xib in Resources */,
 				6ADE705E29C5DD4100A3A84B /* FixationItemView.xib in Resources */,
 				6ADE702A29C53C7300A3A84B /* Assets.xcassets in Resources */,
-				6ADE706C29C6C8C600A3A84B /* memory_mock.json in Resources */,
-				6ADE706A29C692E200A3A84B /* fixation_subscene_mock.json in Resources */,
 				6ADE705829C5C5EC00A3A84B /* FixationViewController.xib in Resources */,
 				6ADE704329C53F6300A3A84B /* SharingViewController.xib in Resources */,
 				6ADE707029C6CB9B00A3A84B /* MemoryCollectionViewCell.xib in Resources */,

@@ -97,7 +97,12 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
 //            print("image!")
 //            self.backgroundImageView.image = image
 //        }
-        self.backgroundImageView.image = UIImage(named: "fixiation_example_background")
+        var sceneId = scene?.sceneId ?? fromScene?.sceneId ?? ""
+        if sceneId.split(separator: "_")[1] != "1" {
+            sceneId = sceneId.split(separator: "_")[0] + "_1"
+        }
+        print(UIImage(named: LogHelper.UserId + "/fixiation_example_background_" + sceneId))
+        self.backgroundImageView.image = UIImage(named: LogHelper.UserId + "/fixiation_example_background_" + sceneId)
     }
     
     private func setupFixationItemViews() {
@@ -672,12 +677,13 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func parseAndRenderMainScene() {
-        parseSceneFromJSON(mock: "fixation_mock", sceneId: fromScene?.sceneId ?? "")
+        let sceneId = fromScene?.sceneId ?? ""
+        parseSceneFromJSON(mock: LogHelper.UserId + "/fixation_mock_" + sceneId, sceneId: sceneId)
         renderFixationItemViews()
     }
     
     private func parseAndRenderSubScene(sceneId: String) {
-        parseSceneFromJSON(mock: "fixation_subscene_mock", sceneId: sceneId)
+        parseSceneFromJSON(mock: LogHelper.UserId + "/fixation_mock_" + sceneId, sceneId: sceneId)
         renderFixationItemViews()
     }
     

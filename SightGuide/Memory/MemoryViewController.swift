@@ -196,28 +196,32 @@ final class MemoryViewController: UIViewController {
     // MARK: - Data
     
     private func requestData() {
-        //        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
-        //            do {
-        //                let response = try Data(contentsOf: url)
-        //                let decoder = JSONDecoder()
-        //                data = try decoder.decode(MemoryResponse.self, from: response)
-        //            } catch {
-        //                print("Error parsing JSON: \(error)")
-        //            }
-        //        }
-        
-        NetworkRequester.requestMemoryLabels(userId: LogHelper.UserId) { result in
-            switch result {
-            case .success(let response):
-                self.data = response
+        let mock = LogHelper.UserId + "/memory_mock"
+        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
+            do {
+                let response = try Data(contentsOf: url)
+                let decoder = JSONDecoder()
+                self.data = try decoder.decode(MemoryResponse.self, from: response)
                 self.collectionView.reloadData()
                 self.currentItemIndex = -2
                 self.currentSectionIndex = 0
-//                self.readCurrentSceneItem()
-            case .failure(let error):
-                print("Error: \(error)")
+            } catch {
+                print("Error parsing JSON: \(error)")
             }
         }
+        
+//        NetworkRequester.requestMemoryLabels(userId: LogHelper.UserId) { result in
+//            switch result {
+//            case .success(let response):
+//                self.data = response
+//                self.collectionView.reloadData()
+//                self.currentItemIndex = -2
+//                self.currentSectionIndex = 0
+////                self.readCurrentSceneItem()
+//            case .failure(let error):
+//                print("Error: \(error)")
+//            }
+//        }
     }
     
     // MARK: - Audio
@@ -350,15 +354,23 @@ extension MemoryViewController: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         if let indexPath = lastSelectedIndexPath {
             if let recordName = data?.data[indexPath.section].labels?[indexPath.item].recordName {
-                NetworkRequester.requestLabelAudioAndPlay(
-                    sceneID: data?.data[indexPath.section].sceneId ?? "",
-                    labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
-                    recordName: recordName) { localURL in
-                        if self.lastSelectedIndexPath == indexPath,
-                        let localURL = localURL {
-                            AudioHelper.playFile(url: localURL)
-                        }
+//                NetworkRequester.requestLabelAudioAndPlay(
+//                    sceneID: data?.data[indexPath.section].sceneId ?? "",
+//                    labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
+//                    recordName: recordName) { localURL in
+//                        if self.lastSelectedIndexPath == indexPath,
+//                        let localURL = localURL {
+//                            AudioHelper.playFile(url: localURL)
+//                        }
+//                    }
+                if self.lastSelectedIndexPath == indexPath {
+                    let mock = LogHelper.UserId + "/" + recordName.split(separator: ".")[0]
+                    if let localUrl = Bundle.main.url(forResource: mock, withExtension: "m4a") {
+                        AudioHelper.playFile(url: localUrl)
+                    } else {
+                        print("!!!" + mock)
                     }
+                }
             }
 //            else {
 //                AudioHelper.playRecording(

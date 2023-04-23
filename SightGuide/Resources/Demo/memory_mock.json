@@ -5,7 +5,9 @@
         "labels": [{
             "label_id": 63,
             "label_name": "影子",
+            "label_text": "周围有影子",
             "duration": 10,
+            "record_name": "glance_fixed_prompt.w4a",
         }]
     }, {
         "scene_id": "1_100",
@@ -13,10 +15,13 @@
         "labels": [{
             "label_id": 61,
             "label_name": "背包",
+            "label_text": "左前方有背包",
             "duration": 3,
+            "record_name": "2021.w4a",
         }, {
             "label_id": 67,
             "label_name": "门",
+            "label_text": "后方有门",
             "duration": 0,
         }]
     }]
