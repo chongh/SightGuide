@@ -169,14 +169,14 @@ final class GlanceViewController: UIViewController {
             case .success(let sceneResponse):
                 var newScene = sceneResponse
 
-                // remove objs with duplicate ID
-                newScene.objs = newScene.objs?.filter({ obj in
-                    !self.seenObjs.contains(obj.objId)
-                })
-                
-                for obj in newScene.objs ?? [] {
-                    self.seenObjs.insert(obj.objId)
-                }
+//                // remove objs with duplicate ID
+//                newScene.objs = newScene.objs?.filter({ obj in
+//                    !self.seenObjs.contains(obj.objId)
+//                })
+//
+//                for obj in newScene.objs ?? [] {
+//                    self.seenObjs.insert(obj.objId)
+//                }
                 
                 self.updateScene(newScene)
             case .failure(let error):
@@ -186,16 +186,40 @@ final class GlanceViewController: UIViewController {
     }
     
     private func updateScene(_ scene: Scene) {
-        initAngle = currentAngle
-        selectedItemIndex = nil
-        self.scene = scene
+//        initAngle = currentAngle
+//        selectedItemIndex = nil
+//        self.scene = scene
+//
+//        self.refreshViews()
+//        refreshTimer?.invalidate()
+//        if
+//            let objs = scene.objs,
+//            objs.count > 0
+//        {
+//            if synthesizer.isSpeaking {
+//                currentItemIndex = -1
+//                print("is speaking")
+//                // read item after finish current reading
+//            } else {
+//                currentItemIndex = 0
+//                readCurrentSceneItem()
+//            }
+//        } else {
+////            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+////                self.requestScene()
+////            }
+//            refreshTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+//                self.requestScene()
+//            }
+//        }
         
-        self.refreshViews()
-        refreshTimer?.invalidate()
-        if
-            let objs = scene.objs,
-            objs.count > 0
-        {
+        if scene.sceneId != self.scene?.sceneId {
+            initAngle = currentAngle
+            selectedItemIndex = nil
+            self.scene = scene
+            
+            self.refreshViews()
+            refreshTimer?.invalidate()
             if synthesizer.isSpeaking {
                 currentItemIndex = -1
                 print("is speaking")
@@ -208,6 +232,7 @@ final class GlanceViewController: UIViewController {
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
 //                self.requestScene()
 //            }
+            refreshTimer?.invalidate()
             refreshTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 self.requestScene()
             }
