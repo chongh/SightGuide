@@ -419,6 +419,8 @@ final class GlanceViewController: UIViewController {
     @objc func threeFingerSwipeDownGestureHandler() {
         LogHelper.log.verbose("Glance Gesture ThreeFingerSwipe")
         
+        synthesizer.stopSpeaking(at: .immediate)
+        
         let fixationViewController = FixationViewController()
         fixationViewController.modalPresentationStyle = .fullScreen
         fixationViewController.fromScene = scene

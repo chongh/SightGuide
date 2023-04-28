@@ -11,7 +11,11 @@
 		2C2BE59E29E7AC9500B14392 /* SwiftyBeaver.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2C2BE59C29E7AC9400B14392 /* SwiftyBeaver.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C2BE5A129E7B49F00B14392 /* LogHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2BE5A029E7B49F00B14392 /* LogHelper.swift */; };
 		2C91B65E29F0EA8A00E84FA5 /* Demo in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B65D29F0EA8A00E84FA5 /* Demo */; };
-		2C91B66829F635C700E84FA5 /* 1 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B66729F635C700E84FA5 /* 1 */; };
+		2C91B67829FBB3B900E84FA5 /* 0427 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B67329FBB3B600E84FA5 /* 0427 */; };
+		2C91B67929FBB3B900E84FA5 /* 0428 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B67429FBB3B700E84FA5 /* 0428 */; };
+		2C91B67A29FBB3B900E84FA5 /* 0424 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B67529FBB3B700E84FA5 /* 0424 */; };
+		2C91B67B29FBB3B900E84FA5 /* 0426 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B67629FBB3B800E84FA5 /* 0426 */; };
+		2C91B67C29FBB3B900E84FA5 /* 0425 in Resources */ = {isa = PBXBuildFile; fileRef = 2C91B67729FBB3B800E84FA5 /* 0425 */; };
 		6ADE702129C53C7200A3A84B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702029C53C7200A3A84B /* AppDelegate.swift */; };
 		6ADE702329C53C7200A3A84B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702229C53C7200A3A84B /* SceneDelegate.swift */; };
 		6ADE702529C53C7200A3A84B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE702429C53C7200A3A84B /* MainViewController.swift */; };
@@ -63,7 +67,11 @@
 		2C2BE59C29E7AC9400B14392 /* SwiftyBeaver.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftyBeaver.xcframework; path = Carthage/Build/SwiftyBeaver.xcframework; sourceTree = "<group>"; };
 		2C2BE5A029E7B49F00B14392 /* LogHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogHelper.swift; sourceTree = "<group>"; };
 		2C91B65D29F0EA8A00E84FA5 /* Demo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Demo; path = SightGuide/Resources/Demo; sourceTree = "<group>"; };
-		2C91B66729F635C700E84FA5 /* 1 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 1; sourceTree = "<group>"; };
+		2C91B67329FBB3B600E84FA5 /* 0427 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 0427; sourceTree = "<group>"; };
+		2C91B67429FBB3B700E84FA5 /* 0428 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 0428; sourceTree = "<group>"; };
+		2C91B67529FBB3B700E84FA5 /* 0424 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 0424; sourceTree = "<group>"; };
+		2C91B67629FBB3B800E84FA5 /* 0426 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 0426; sourceTree = "<group>"; };
+		2C91B67729FBB3B800E84FA5 /* 0425 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 0425; sourceTree = "<group>"; };
 		6ADE701D29C53C7200A3A84B /* SightGuide1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SightGuide1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ADE702029C53C7200A3A84B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6ADE702229C53C7200A3A84B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -140,7 +148,11 @@
 		6ADE701429C53C7200A3A84B = {
 			isa = PBXGroup;
 			children = (
-				2C91B66729F635C700E84FA5 /* 1 */,
+				2C91B67529FBB3B700E84FA5 /* 0424 */,
+				2C91B67729FBB3B800E84FA5 /* 0425 */,
+				2C91B67629FBB3B800E84FA5 /* 0426 */,
+				2C91B67329FBB3B600E84FA5 /* 0427 */,
+				2C91B67429FBB3B700E84FA5 /* 0428 */,
 				2C91B65D29F0EA8A00E84FA5 /* Demo */,
 				6ADE701F29C53C7200A3A84B /* SightGuide */,
 				6ADE701E29C53C7200A3A84B /* Products */,
@@ -310,7 +322,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C91B66829F635C700E84FA5 /* 1 in Resources */,
+				2C91B67829FBB3B900E84FA5 /* 0427 in Resources */,
+				2C91B67929FBB3B900E84FA5 /* 0428 in Resources */,
+				2C91B67A29FBB3B900E84FA5 /* 0424 in Resources */,
+				2C91B67B29FBB3B900E84FA5 /* 0426 in Resources */,
+				2C91B67C29FBB3B900E84FA5 /* 0425 in Resources */,
 				2C91B65E29F0EA8A00E84FA5 /* Demo in Resources */,
 				6ADE702D29C53C7300A3A84B /* LaunchScreen.storyboard in Resources */,
 				6ADE704729C5497400A3A84B /* glance_fixed_prompt.m4a in Resources */,

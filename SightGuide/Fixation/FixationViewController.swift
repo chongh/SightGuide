@@ -195,6 +195,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func readText(text: String) {
         print(text)
+        synthesizer.stopSpeaking(at: .immediate)
+        AudioHelper.audioPlayer?.pause()
         let speechUtterance = AVSpeechUtterance(string: text)
         speechUtterance.rate = 0.7
         speechUtterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
@@ -223,6 +225,10 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             text += "标记"
             text += lastTouchedView?.item?.isRecord == true ? "有" : "无"
             text += "录音"
+            if lastTouchedView?.item?.labelId != nil {
+                text += "。"
+                text += lastTouchedView?.item?.text ?? ""
+            }
         } else {
             text += lastTouchedView?.item?.text ?? ""
         }
@@ -346,7 +352,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             var action = "Fixation Gesture Pan "
             action += String.init(format: "%.2f, ", touchLocation.x)
             action += String.init(format: "%.2f", touchLocation.y)
-            LogHelper.log.verbose(action)
+//            LogHelper.log.verbose(action)
             lastTouchedViews.removeAll()
             for v in fixationItemViews{
                 let convertedPoint = v.convert(touchLocation, from: view)
@@ -761,6 +767,16 @@ extension FixationViewController: AVSpeechSynthesizerDelegate {
             
             AudioHelper.playRecording(sceneID: scene?.sceneId ?? "", objectID: item.objId)
             needPlayAudio = false
+        } else if isFromLabel,
+                  lastTouchedView?.item?.text != nil,
+                  utterance.speechString.contains(lastTouchedView?.item?.text ?? "??"),
+                  let recordName = lastTouchedView?.item?.recordName {
+            let mock = LogHelper.UserId + "/" + recordName.split(separator: ".")[0]
+            if let localUrl = Bundle.main.url(forResource: mock, withExtension: "m4a") {
+                AudioHelper.playFile(url: localUrl)
+            } else {
+                print("find no file:" + mock)
+            }
         }
     }
 }

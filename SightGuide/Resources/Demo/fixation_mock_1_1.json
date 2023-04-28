@@ -41,6 +41,8 @@
                 "w": 12
             },
             "label_id": 63,
+            "is_record": true,
+            "record_name": "demo_label"
         },
         {
             "obj_id": 64,
@@ -54,7 +56,8 @@
                 "h": 12,
                 "w": 12
             },
-            "scene_id": "1_100"
+            "scene_id": "1_100",
+            "label_id": 64
         },
         {
             "obj_id": 9999,

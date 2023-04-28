@@ -95,7 +95,7 @@ final class MemoryViewController: UIViewController {
     }
     
     @objc func handleDoubleTapItemViewGesture() {
-        if currentItemIndex <= -1{
+        if currentItemIndex <= -1 || currentItemIndex >= data?.data.count ?? 0 {
             return
         }
         readText(text: "为您展开场景")
@@ -259,6 +259,7 @@ final class MemoryViewController: UIViewController {
     
     private func readCurrentSceneItem() {
         print(currentItemIndex)
+        let currentItemIndex = currentItemIndex
         if currentItemIndex < -1 || currentItemIndex >= data?.data.count ?? 0 {
             return
         }
