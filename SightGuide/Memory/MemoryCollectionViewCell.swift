@@ -28,6 +28,11 @@ final class MemoryCollectionViewCell: UICollectionViewCell {
         innerView.cell = self
     }
     
+    func renderScene(scene: Scene) {
+        titleLabel.text = scene.sceneName
+        innerView.cell = self
+    }
+    
     func setStandardBorder() {
         innerView.layer.borderWidth = 2
     }
