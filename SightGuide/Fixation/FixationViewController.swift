@@ -224,11 +224,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             text += lastTouchedView?.item?.labelId == nil ? "无" : "已"
             text += "标记"
             text += lastTouchedView?.item?.isRecord == true ? "有" : "无"
-            text += "录音"
-            if lastTouchedView?.item?.labelId != nil {
-                text += "。"
-                text += lastTouchedView?.item?.text ?? ""
-            }
+            text += "录音。"
+            text += lastTouchedView?.item?.text ?? ""
         } else {
             text += lastTouchedView?.item?.text ?? ""
         }
