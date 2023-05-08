@@ -36,7 +36,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private var pendingDismiss = false
     private var isBack = false
     private var isFirst = true
-    private var needPlayAudio = false
+    private var audioObjId: Int?
     
     // timer
     private var timer: Timer?
@@ -210,6 +210,9 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     private func readLastTouchedView() {
+        synthesizer.stopSpeaking(at: .immediate)
+        audioObjId = nil
+        AudioHelper.audioPlayer?.stop()
         var text = lastTouchedView?.item?.objName ?? ""
         if isFromLabel {
             text += lastTouchedView?.item?.labelId == nil ? "无" : "已"
@@ -585,7 +588,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             lastTouchedView?.displayDot()
             
             uploadLabelVoice(objectID: item.objId, objectName: item.objName, objectText: item.text)
-            needPlayAudio = true
+            audioObjId = item.objId
             var action = "INPUT Fixation RecordFinish "
             action += item.objName
             LogHelper.log.info(action)
@@ -745,13 +748,17 @@ extension FixationViewController: AVSpeechSynthesizerDelegate {
             dismiss(animated: true, completion: nil)
         } else if isMarking {
             startRecording()
-        } else if needPlayAudio {
+        } else if audioObjId != nil {
             guard
                 let item = lastTouchedView?.item
             else { return }
             
+            if item.objId != audioObjId{
+                return
+            }
+            
             AudioHelper.playRecording(sceneID: scene?.sceneId ?? "", objectID: item.objId)
-            needPlayAudio = false
+            audioObjId = nil
         }
     }
 }
