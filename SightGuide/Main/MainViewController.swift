@@ -17,20 +17,10 @@ final class MainViewController: UIViewController {
         // Do any additional setup after loading the view.
         LogHelper.Setup()
     }
-
-    @IBAction func glanceButtonClickedAction(_ sender: Any) {
-        let glanceViewController = GlanceViewController()
-        navigationController?.pushViewController(glanceViewController, animated: true)
-    }
     
     @IBAction func memoryButtonClickedAction(_ sender: Any) {
         let memoryViewController = MemoryViewController()
         navigationController?.pushViewController(memoryViewController, animated: true)
-    }
-    
-    @IBAction func sharingButtonClickedAction(_ sender: Any) {
-        let sharingViewController = SharingViewController()
-        navigationController?.pushViewController(sharingViewController, animated: true)
     }
     
     @IBAction func startButtonClickedAction(_ sender: Any) {

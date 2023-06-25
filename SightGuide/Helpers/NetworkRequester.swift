@@ -20,54 +20,21 @@ enum APIError: Error {
     case parsingFailed
 }
 
-private let BaseURL = "http://192.168.42.6:8080"    // camera
-//private let BaseURL = "http://192.168.3.38:8080"  // qy
-//private let BaseURL = "http://192.168.1.19:8080"  // qy303
-//private let BaseURL = "http://192.168.14.176:8080"    // air
+ private let BaseURL = "http://43.129.21.10:8080"    // online
+//private let BaseURL = "http://192.168.2.208:8080"    // online
+
 
 final class NetworkRequester {
-    
-    // MARK: - Glance
-    
-    static func getScene(completion: @escaping (Result<Scene, APIError>) -> Void) {
-        let urlString = "/glance/data"
-        performRequest(urlString: urlString, method: .get, completion: completion)
-    }
-    
-    static func getIMUData(completion: @escaping (Result<IMUData, APIError>) -> Void) {
-        let urlString = "/glance/imu"
-        performRequest(urlString: urlString, method: .get, completion: completion)
-    }
-    
-    static func postLikeGlanceItem(objId: Int, like: Int, sceneId: String?, completion: @escaping (Result<Void, APIError>) -> Void) {
-        let urlString = "/glance/like"
-        
-        let params: [String: Any] = [
-            "obj_id": objId,
-            "like": like,
-            "scene_id": sceneId
-        ]
-        
-        performRequest(urlString: urlString, method: .post, bodyParams: params) { (result: Result<CommonResponse, APIError>) in
-            switch result {
-            case .success(let response):
-                if response.result == 0 {
-                    completion(.success(()))
-                } else {
-                    completion(.failure(.requestFailed))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
     // MARK: - Fixation
     
-    static func postFixationData(sceneId: String?, completion: @escaping (Result<Scene, APIError>) -> Void) {
+    static func postFixationData(sceneId: String?,
+                                 token: String,
+                                 completion: @escaping (Result<Scene, APIError>) -> Void) {
         let urlString = "/fixation/data"
         
-        var params: [String: Any] = [:]
+        var params: [String: Any] = [
+            "token":token
+        ]
         
         if let sceneId = sceneId{
             params["scene_id"] = sceneId
@@ -76,87 +43,22 @@ final class NetworkRequester {
         performRequest(urlString: urlString, method: .post, bodyParams: params, completion: completion)
     }
     
-    static func requestFixationImage(sceneId: String, completion: @escaping (UIImage?) -> Void) {
+    static func requestFixationImage(sceneId: String, token: String, completion: @escaping (UIImage?) -> Void) {
         let urlString = "/fixation/img"
         let params: [String: String] = [
+            "token": token,
             "scene_id": sceneId
         ]
         
         requestImage(urlString: urlString, queryParameters: params, completion: completion)
     }
     
-    static func requestUploadLabelVoice(sceneID: String, objectID: Int, completionHandler: @escaping (String?, Error?) -> Void) {
-        requestUploadAudioFile(
-            urlString: "/fixation/label_voice",
-            fileURL: AudioHelper.audioFileURL(sceneID: sceneID, objectID: objectID),
-            completionHandler: completionHandler)
-    }
-    
-    static func requestCreateLabel(
-        sceneID: String,
-        sceneName: String,
-        objectID: Int,
-        objectName: String,
-        objectText: String,
-        recordName: String?,
-        userId: String,
-        completion: @escaping (Result<CreateLabelResponse, APIError>) -> Void)
-    {
-        let urlString = "/fixation/label"
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateString = dateFormatter.string(from: Date())
-        
-        var params: [String: Any] = [
-            "scene_id": sceneID,
-            "scene_name": sceneName,
-            "obj_id": objectID,
-            "obj_name": objectName,
-            "obj_text": objectText,
-            "time": dateString,
-            "user_id": userId,
-        ]
-        
-        if let recordName = recordName {
-            params["record_name"] = recordName
-        }
-        
-        performRequest(
-            urlString: urlString,
-            method: .post,
-            bodyParams: params,
-            completion: completion)
-    }
-    
-    static func requestCreateLog(
-        action: String,
-        completion: @escaping (Result<CommonResponse, APIError>) -> Void)
-    {
-        let urlString = "/common/log"
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let dateString = dateFormatter.string(from: Date())
-        
-        var params: [String: Any] = [
-            "time": dateString,
-            "action": action,
-        ]
-        
-        performRequest(
-            urlString: urlString,
-            method: .post,
-            bodyParams: params,
-            completion: completion)
-    }
-    
     // MARK: - Memory
     
-    static func requestMemoryLabels(userId: String, completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {
+    static func requestMemoryLabels(token: String, completion: @escaping (Result<MemoryResponse, APIError>) -> Void) {
         let urlString = "/memory/labels"
         let params: [String: Any] = [
-            "user_id": userId,
+            "token": token
         ]
         performRequest(
             urlString: urlString,
@@ -166,14 +68,12 @@ final class NetworkRequester {
     }
     
     static func requestLabelAudioAndPlay(
-        sceneID: String,
-        labelID: Int,
+        token: String,
         recordName: String,
         completion: @escaping (URL?) -> Void)
     {
         let params: [String: Any] = [
-            "scene_id": sceneID,
-            "label_id": labelID,
+            "token": token,
             "record_name": recordName
         ]
         
@@ -181,10 +81,6 @@ final class NetworkRequester {
     }
     
     // MARK: - Common
-    static func getParams(completion: @escaping (Result<BasicParams, APIError>) -> Void) {
-        let urlString = "/common/params"
-        performRequest(urlString: urlString, method: .get, completion: completion)
-    }
     
     static func performRequest<T: Codable>(
         urlString: String,
@@ -216,6 +112,7 @@ final class NetworkRequester {
         }
         
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Basic YmFzaWM6WW14cGJtUXhNak1oUUE9PQ==", forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
@@ -255,6 +152,7 @@ final class NetworkRequester {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.addValue("Basic YmFzaWM6WW14cGJtUXhNak1oUUE9PQ==", forHTTPHeaderField: "Authorization")
         
         guard let requestBody = try? JSONSerialization.data(withJSONObject: queryParameters, options: []) else {
             completion(nil)
@@ -307,6 +205,7 @@ final class NetworkRequester {
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.addValue("Basic YmFzaWM6WW14cGJtUXhNak1oUUE9PQ==", forHTTPHeaderField: "Authorization")
         
         guard let requestBody = try? JSONSerialization.data(withJSONObject: queryParameters, options: []) else {
             return
@@ -325,21 +224,6 @@ final class NetworkRequester {
             }
         }
         task.resume()
-        
-//        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-//            if let error = error {
-//                print("Error: \(error.localizedDescription)")
-//                return
-//            }
-//
-//            guard let data = data else {
-//                print("No data received")
-//                return
-//            }
-//
-//
-//        }
-//        task.resume()
     }
     
     static func requestUploadAudioFile(urlString: String, fileURL: URL, completionHandler: @escaping (String?, Error?) -> Void) {
@@ -351,6 +235,7 @@ final class NetworkRequester {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("audio/m4a", forHTTPHeaderField: "Content-Type") // 设置为音频文件的 MIME 类型
+        request.addValue("Basic YmFzaWM6WW14cGJtUXhNak1oUUE9PQ==", forHTTPHeaderField: "Authorization")
         
         do {
             let audioData = try Data(contentsOf: fileURL)

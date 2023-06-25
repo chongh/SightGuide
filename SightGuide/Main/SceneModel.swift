@@ -45,6 +45,7 @@ struct SceneItem: Codable {
     let angles: [Double]?
     var labelId: Int?
     var isRecord: Bool?
+    var recordName: String?
     
     enum CodingKeys: String, CodingKey {
         case objId = "obj_id"
@@ -58,6 +59,7 @@ struct SceneItem: Codable {
         case angles
         case labelId = "label_id"
         case isRecord = "is_record"
+        case recordName = "record_name"
     }
 }
 

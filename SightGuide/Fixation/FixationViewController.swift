@@ -93,7 +93,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     // MARK: - View
     
     private func setupBackgroundImageView() {
-        NetworkRequester.requestFixationImage(sceneId: scene?.sceneId ?? fromScene?.sceneId ?? "") { image in
+        NetworkRequester.requestFixationImage(sceneId: scene?.sceneId ?? fromScene?.sceneId ?? "", token: LogHelper.UserId) { image in
             print("image!")
             self.backgroundImageView.image = image
         }
@@ -106,17 +106,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             fixationItemView.isHidden = true
             view.addSubview(fixationItemView)
             fixationItemViews.append(fixationItemView)
-            
-//            let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapItemViewGesture))
-//            doubleTapGestureRecognizer.numberOfTapsRequired = 2
-//            fixationItemView.addGestureRecognizer(doubleTapGestureRecognizer)
-//
-//            let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
-//            fixationItemView.addGestureRecognizer(singleTapGestureRecognizer)
-//            guard let doubleTapGestureRecognizer = self.doubleTapGestureRecognizer else { return }
-//            guard let doubleTapDoubleFingerGestureRecognizer = self.doubleTapDoubleFingerGestureRecognizer else { return }
-//            singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
-//            singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
         }
     }
     
@@ -169,10 +158,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         
         self.synthesizer.stopSpeaking(at: .immediate)
         beepAudioPlayer?.play()
-//        timer?.invalidate()
-//        timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
-//            self.readLastTouchedView()
-//        }
         self.readLastTouchedView()
         var action = "INPUT Fixation Touch "
         action += itemView.item?.objName ?? ""
@@ -218,7 +203,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             text += lastTouchedView?.item?.labelId == nil ? "无" : "已"
             text += "标记"
             text += lastTouchedView?.item?.isRecord == true ? "有" : "无"
-            text += "录音"
+            text += "录音。"
+            text += lastTouchedView?.item?.text ?? ""
         } else {
             text += lastTouchedView?.item?.text ?? ""
         }
@@ -229,68 +215,16 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     private func setupGestures() {
         setupPanGesture()
-//        setupSwipeGesture()
-//        setupTwoFingerSwipeLeftGesture()
-        setupLongPressGestures()
-        setupMarkGestures()
         setupTapGesture()
     }
 
     private func setupTapGesture() {
-        let doubleTapDoubleFingerGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
-        doubleTapDoubleFingerGestureRecognizer.numberOfTapsRequired = 1
-        doubleTapDoubleFingerGestureRecognizer.numberOfTouchesRequired = 2
-        view.addGestureRecognizer(doubleTapDoubleFingerGestureRecognizer)
-        
         let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapItemViewGesture))
         doubleTapGestureRecognizer.numberOfTapsRequired = 2
         view.addGestureRecognizer(doubleTapGestureRecognizer)
-        doubleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
-        
-//        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapItemViewGesture(_:)))
-//        view.addGestureRecognizer(singleTapGestureRecognizer)
-//        singleTapGestureRecognizer.require(toFail: doubleTapGestureRecognizer)
-//        singleTapGestureRecognizer.require(toFail: doubleTapDoubleFingerGestureRecognizer)
-    }
-    
-    private func setupSwipeGesture() {
-        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
-        swipeLeftGesture.direction = .left
-        swipeLeftGesture.numberOfTouchesRequired = 3
-        swipeLeftGesture.delegate = self
-        view.addGestureRecognizer(swipeLeftGesture)
-        
-        let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
-        swipeRightGesture.direction = .right
-        swipeRightGesture.numberOfTouchesRequired = 3
-        swipeRightGesture.delegate = self
-        view.addGestureRecognizer(swipeRightGesture)
-    }
-    
-    @objc func handleThreeFingerSwipeUpGesture() {
-        LogHelper.log.verbose("Fixation Gesture ThreeFingerSwipe")
-
-        if isFromLabel == false{
-            readText(text: "您已回到边走边听")
-        }
-        pendingDismiss = true
-        let action = "INPUT Fixation BackToGlance"
-        LogHelper.log.info(action)
     }
     
     private func setupPanGesture() {
-        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
-        swipeLeftGesture.direction = .left
-        swipeLeftGesture.numberOfTouchesRequired = 3
-        swipeLeftGesture.delegate = self
-        view.addGestureRecognizer(swipeLeftGesture)
-        
-        let swipeRightGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleThreeFingerSwipeUpGesture))
-        swipeRightGesture.direction = .right
-        swipeRightGesture.numberOfTouchesRequired = 3
-        swipeRightGesture.delegate = self
-        view.addGestureRecognizer(swipeRightGesture)
-        
         let twoFingerSwipeLeftGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleTwoFingerSwipeLeftGesture))
         twoFingerSwipeLeftGestureRecognizer.direction = .left
         twoFingerSwipeLeftGestureRecognizer.numberOfTouchesRequired = 2
@@ -306,33 +240,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         view.addGestureRecognizer(panGestureRecognizer)
         panGestureRecognizer.require(toFail: twoFingerSwipeLeftGestureRecognizer)
         panGestureRecognizer.require(toFail: twoFingerSwipeRightGestureRecognizer)
-        panGestureRecognizer.require(toFail: swipeLeftGesture)
-        panGestureRecognizer.require(toFail: swipeRightGesture)
     }
-    
-//    @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
-//        let touchLocation = gestureRecognizer.location(in: view)
-//
-//        switch gestureRecognizer.state {
-//        case .began, .changed:
-//            if let fixationItemView = view.hitTest(touchLocation, with: nil) as? FixationItemView {
-//                if tmpView != fixationItemView {
-//                    setFocusedItemView(itemView: fixationItemView)
-//                    tmpView = fixationItemView
-//                }
-//            }
-//            else {
-//                // lose focus if move finger to outside the item view
-////                cancelFocusedItemView()
-//                tmpView = nil
-//            }
-//        case .ended, .cancelled, .failed:
-//            // won't lose focus if user's finger leave screen without moving outside the item view
-//            timer?.invalidate()
-//        default:
-//            break
-//        }
-//    }
     
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         let touchLocation = gestureRecognizer.location(in: view)
@@ -372,18 +280,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             else {
                 tmpView = nil
             }
-
-//            if let fixationItemView = view.point(inside: touchLocation, with: nil) as? FixationItemView {
-//                if tmpView != fixationItemView {
-//                    setFocusedItemView(itemView: fixationItemView)
-//                    tmpView = fixationItemView
-//                }
-//            }
-//            else {
-//                // lose focus if move finger to outside the item view
-////                cancelFocusedItemView()
-//                tmpView = nil
-//            }
         case .ended, .cancelled, .failed:
             // won't lose focus if user's finger leave screen without moving outside the item view
             timer?.invalidate()
@@ -418,30 +314,11 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
             isRootScene = true
             self.isBack = true
             parseAndRenderMainScene()
-//            readText(text: "为您返回\(scene?.sceneName ?? "")")
             let action = "INPUT Fixation BackToMain"
             LogHelper.log.info(action)
 
         }
     }
-    
-//    @objc func handleTapItemViewGesture(_ sender: UITapGestureRecognizer) {
-//        if let itemView = sender.view as? FixationItemView {
-//            if
-//                isFromLabel,
-//                itemView.item?.labelId != nil,
-//                itemView.item?.isRecord == true
-//            {
-//                AudioHelper.playRecording(
-//                    sceneID: scene?.sceneId ?? "",
-//                    objectID: itemView.item?.objId ?? 0)
-//            } else {
-//                if self.lastTouchedView == itemView{
-//                    readText(text: itemView.item?.text ?? "")
-//                }
-//            }
-//        }
-//    }
 
     @objc func handleTapItemViewGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         LogHelper.log.verbose("Fixation Gesture Tap")
@@ -472,20 +349,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     
     @objc func handleDoubleTapItemViewGesture() {
         LogHelper.log.verbose("Fixation Gesture DoubleTap")
-
-//        guard
-//            isRootScene,
-//            let itemView = sender.view as? FixationItemView,
-//            let item = itemView.item
-//        else { return }
-//
-//        if self.lastTouchedView == itemView{
-//            if (!(item.sceneId?.isEmpty ?? true)) {
-//                isRootScene = false
-//                parseAndRenderSubScene(sceneId: item.sceneId ?? "")
-//    //            readSceneName()
-//            }
-//        }
         
         guard
             isRootScene,
@@ -501,130 +364,7 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
-    private func setupMarkGestures() {
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleDoubleLongPressGesture))
-        longPressGestureRecognizer.numberOfTouchesRequired = 2
-        longPressGestureRecognizer.minimumPressDuration = 1
-        view.addGestureRecognizer(longPressGestureRecognizer)
-    }
-    
-    @objc func handleDoubleTapGesture(_ gesture: UITapGestureRecognizer) {
-        lastDoubleTapTimestamp = Date().timeIntervalSince1970
-    }
-    
-    @objc func handleDoubleLongPressGesture(_ gesture: UILongPressGestureRecognizer) {
-        guard let lastDoubleTapTimestamp = lastDoubleTapTimestamp else { return }
-        
-        if gesture.state == .began {
-            if Date().timeIntervalSince1970 - lastDoubleTapTimestamp <= 3 {
-                markFocusedItemView()
-            }
-        } else if gesture.state == .ended || gesture.state == .cancelled {
-            endMarkFocusedItemView()
-        }
-    }
-    
-    private func setupLongPressGestures() {
-        let refreshGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleRefreshGesture))
-        refreshGestureRecognizer.minimumPressDuration = 5
-        view.addGestureRecognizer(refreshGestureRecognizer)
-    }
-    
-    @objc func handleRefreshGesture(_ gesture: UILongPressGestureRecognizer) {
-        if gesture.state == .began {
-            beepAudioPlayer?.play()
-        }
-        if gesture.state == .ended || gesture.state == .cancelled {
-            sleep(LogHelper.params?.fixationWaitTime ?? 5)
-            NetworkRequester.postFixationData (
-                sceneId: nil, completion: { result in
-                    switch result {
-                    case .success(let sceneResponse):
-                        self.scene = sceneResponse
-                        self.renderFixationItemViews()
-                        self.readSceneName()
-                    case .failure(let error):
-                        print("Error: \(error)")
-                    }
-                })
-            renderFixationItemViews()
-        }
-    }
-    
     // MARK: - Mark
-    
-    func markFocusedItemView() {
-        guard
-            lastTouchedView != nil
-//            lastTouchedView?.item?.type != 0
-        else {
-            return
-        }
-        
-        synthesizer.stopSpeaking(at: .immediate)
-        isMarking = true
-        readText(text: "您已标记，继续长按可录音添加标签!滴")
-        let action = "INPUT Fixation LabelStart"
-        LogHelper.log.info(action)
-    }
-    
-    func endMarkFocusedItemView() {
-        isMarking = false
-        
-        guard
-            let item = lastTouchedView?.item
-        else { return }
-        
-        if AudioHelper.isRecording() {
-            AudioHelper.endRecording()
-            
-            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) || labeledEmptyObjIds.contains(item.objId) ? "修改" : "制作")录音标签")
-            
-            if labeledEmptyObjIds.contains(item.objId){
-                labeledEmptyObjIds.remove(item.objId)
-            }
-            
-            labeledObjIds.insert(item.objId)
-            lastTouchedView?.displayDot()
-            
-            uploadLabelVoice(objectID: item.objId, objectName: item.objName, objectText: item.text)
-            audioObjId = item.objId
-            var action = "INPUT Fixation RecordFinish "
-            action += item.objName
-            LogHelper.log.info(action)
-        } else {
-            readText(text: "您已为\(item.objName)\(item.labelId != nil || labeledObjIds.contains(item.objId) || labeledEmptyObjIds.contains(item.objId) ? "修改" : "制作")标签")
-            
-            if labeledObjIds.contains(item.objId){
-                labeledObjIds.remove(item.objId)
-            }
-            
-            labeledEmptyObjIds.insert(item.objId)
-            lastTouchedView?.displayEmptyDot()
-            
-            self.createLabel(
-                objectID: item.objId,
-                objectName: item.objName,
-                objectText: item.text,
-                recordName: nil)
-            var action = "INPUT Fixation LabelFinish "
-            action += item.objName
-            LogHelper.log.info(action)
-        }
-    }
-    
-    func startRecording() {
-        guard
-            isMarking,
-            let item = lastTouchedView?.item
-        else { return }
-        
-        AudioHelper.startRecording(
-            sceneID: scene?.sceneId ?? "",
-            objectID: item.objId)
-        var action = "INPUT Fixation RecordStart"
-        LogHelper.log.info(action)
-    }
     
     private func readSceneName() {
         if self.isBack {
@@ -647,18 +387,8 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     // MARK: - Data
     
     private func parseSceneFromJSON(mock: String, sceneId: String) {
-//        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
-//            do {
-//                let data = try Data(contentsOf: url)
-//                let decoder = JSONDecoder()
-//                scene = try decoder.decode(Scene.self, from: data)
-//            } catch {
-//                print("Error parsing JSON: \(error)")
-//            }
-//        }
-        
         NetworkRequester.postFixationData (
-            sceneId: sceneId, completion: { result in
+            sceneId: sceneId, token: LogHelper.UserId, completion: { result in
             switch result {
             case .success(let sceneResponse):
                 self.scene = sceneResponse
@@ -678,42 +408,6 @@ class FixationViewController: UIViewController, AVAudioRecorderDelegate {
     private func parseAndRenderSubScene(sceneId: String) {
         parseSceneFromJSON(mock: "fixation_subscene_mock", sceneId: sceneId)
         renderFixationItemViews()
-    }
-    
-    private func uploadLabelVoice(objectID: Int, objectName: String, objectText: String) {
-        NetworkRequester.requestUploadLabelVoice(
-            sceneID: scene?.sceneId ?? "",
-            objectID: objectID) { recordName, error in
-                if let error = error {
-                    print(error)
-                    return
-                }
-                
-                self.createLabel(
-                    objectID: objectID,
-                    objectName: objectName,
-                    objectText: objectText,
-                    recordName: recordName)
-            }
-    }
-    
-    private func createLabel(
-        objectID: Int,
-        objectName: String,
-        objectText: String,
-        recordName: String?)
-    {
-        NetworkRequester.requestCreateLabel(
-            sceneID: self.scene?.sceneId ?? "",
-            sceneName: self.scene?.sceneName ?? "",
-            objectID: objectID,
-            objectName: objectName,
-            objectText: objectText,
-            recordName: recordName ?? "",
-            userId: LogHelper.UserId,
-            completion: { result in
-                print(result)
-            })
     }
     
     // MARK: - Landscape
@@ -744,10 +438,9 @@ extension FixationViewController: UIGestureRecognizerDelegate {
 
 extension FixationViewController: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        print(lastTouchedView?.item?.text == "" ? "我自己" : lastTouchedView?.item?.text)
         if pendingDismiss {
             dismiss(animated: true, completion: nil)
-        } else if isMarking {
-            startRecording()
         } else if audioObjId != nil {
             guard
                 let item = lastTouchedView?.item
@@ -759,6 +452,17 @@ extension FixationViewController: AVSpeechSynthesizerDelegate {
             
             AudioHelper.playRecording(sceneID: scene?.sceneId ?? "", objectID: item.objId)
             audioObjId = nil
+        } else if isFromLabel,
+                  let tmpText = lastTouchedView?.item?.text == "" ? "我自己" : lastTouchedView?.item?.text,
+                  utterance.speechString.contains(tmpText),
+                  let recordName = lastTouchedView?.item?.recordName {
+            NetworkRequester.requestLabelAudioAndPlay(token: LogHelper.UserId, recordName: recordName) { localURL in
+                if let tmpText = self.lastTouchedView?.item?.text == "" ? "我自己" : self.lastTouchedView?.item?.text,
+                    utterance.speechString.contains(tmpText),
+                let localURL = localURL {
+                    AudioHelper.playFile(url: localURL)
+                }
+            }
         }
     }
 }

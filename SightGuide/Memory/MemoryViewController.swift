@@ -73,13 +73,6 @@ final class MemoryViewController: UIViewController {
     }
     
     // MARK: - Gestures
-    
-    //    private func setupPanGesture() {
-    //        let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-    //        panGestureRecognizer.delegate = self
-    //        view.addGestureRecognizer(panGestureRecognizer)
-    //    }
-    
     private func setupSwipeGesture() {
         let swipeUpGesture = UISwipeGestureRecognizer(target: self, action: #selector(swipeGestureHandler(_:)))
         swipeUpGesture.direction = .up
@@ -105,7 +98,7 @@ final class MemoryViewController: UIViewController {
         
         if let indexPath = indexPathPendingExpand {
             let fixationViewController = FixationViewController()
-            fixationViewController.fromScene = data?.data[indexPath.section]
+            fixationViewController.fromScene = data?.data[indexPath.item]
             fixationViewController.isFromLabel = true
             fixationViewController.modalPresentationStyle = .fullScreen
             present(fixationViewController, animated: true, completion: nil)
@@ -114,99 +107,25 @@ final class MemoryViewController: UIViewController {
         }
     }
     
-    //    @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
-    //        let touchLocation = gestureRecognizer.location(in: view)
-    //
-    //        switch gestureRecognizer.state {
-    //        case .began, .changed:
-    //            if let memoryCell = (view.hitTest(touchLocation, with: nil) as? InnerView)?.cell {
-    //                if
-    //                    let indexPath = collectionView.indexPath(for: memoryCell),
-    //                    indexPath != lastSelectedIndexPath
-    //                {
-    //                    lastSelectedIndexPath = indexPath
-    //
-    //                    self.synthesizer.stopSpeaking(at: .immediate)
-    //                    AudioHelper.audioPlayer?.stop()
-    //                    beepAudioPlayer?.play()
-    //
-    //                    timer?.invalidate()
-    //                    timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-    //                        self.readMemory(indexPath: indexPath)
-    //                    }
-    //                }
-    //            } else {
-    //                timer?.invalidate()
-    //                lastSelectedIndexPath = nil
-    //            }
-    //        case .ended, .cancelled, .failed:
-    //            timer?.invalidate()
-    //            lastSelectedIndexPath = nil
-    //        default:
-    //            break
-    //        }
-    //    }
-    
     @objc func swipeGestureHandler(_ sender: UISwipeGestureRecognizer) {
         self.synthesizer.stopSpeaking(at: .immediate)
         if sender.direction == .up {
-            if self.currentItemIndex + 1 >= self.data?.data[self.currentSectionIndex].labels?.count ?? 0 {
-                if self.currentSectionIndex + 1 >= self.data?.data.count ?? 0 {
-                    print("end")
-                    return
-                }
-                else {
-                    self.currentSectionIndex += 1
-                    self.currentItemIndex = -1
-                }
-            }
-            else {
-                self.currentItemIndex += 1
+            if self.currentItemIndex > -2 {
+                self.currentItemIndex -= 1
             }
             readCurrentSceneItem()
         } else if sender.direction == .down {
-            if self.currentItemIndex == -2 {
-                // init do not handle down
-                return
-            }
-            if self.currentItemIndex == -1 {
-                if self.currentSectionIndex == 0 {
-                    print("begin")
-                    return
-                }
-                else {
-                    self.currentSectionIndex -= 1
-                    self.currentItemIndex = self.data?.data[self.currentSectionIndex].labels?.count ?? 0
-                    self.currentItemIndex -= 1
-                }
-            }
-            else {
-                self.currentItemIndex -= 1
+            if self.currentItemIndex < self.data?.data.count ?? 0 {
+                self.currentItemIndex += 1
             }
             readCurrentSceneItem()
         }
     }
     
-//    private func handleDoubleTapCell(indexPath: IndexPath) {
-//        readText(text: "为您展开场景标签")
-//        indexPathPendingExpand = indexPath
-//    }
-    
-    
     // MARK: - Data
     
     private func requestData() {
-        //        if let url = Bundle.main.url(forResource: mock, withExtension: "json") {
-        //            do {
-        //                let response = try Data(contentsOf: url)
-        //                let decoder = JSONDecoder()
-        //                data = try decoder.decode(MemoryResponse.self, from: response)
-        //            } catch {
-        //                print("Error parsing JSON: \(error)")
-        //            }
-        //        }
-        
-        NetworkRequester.requestMemoryLabels(userId: LogHelper.UserId) { result in
+        NetworkRequester.requestMemoryLabels(token: LogHelper.UserId) { result in
             switch result {
             case .success(let response):
                 self.data = response
@@ -252,31 +171,25 @@ final class MemoryViewController: UIViewController {
     }
     
     private func readCurrentSceneItem() {
-        if currentItemIndex < -1 {
+        if currentItemIndex < -1 || currentItemIndex >= data?.data.count ?? 0 {
             return
         }
-        print(currentSectionIndex)
-        print(currentItemIndex)
-        
+
         if currentItemIndex == -1 {
-            // header
-//            let cell = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader , withReuseIdentifier: SectionHeaderID, for: IndexPath(index: currentSectionIndex)) as! MemorySectionHeaderView
-            print(data?.data[currentSectionIndex].sceneName ?? "")
             beepAudioPlayer?.play()
-            
+
             timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-                self.readText(text: self.data?.data[self.currentSectionIndex].sceneName ?? "")
+                self.readText(text: "用户" + LogHelper.UserId)
             }
             lastSelectedIndexPath = nil
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID, for: IndexPath(item: currentItemIndex, section: currentSectionIndex)) as! MemoryCollectionViewCell
-            print(data?.data[currentSectionIndex].labels?[currentItemIndex].labelName ?? "")
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID, for: IndexPath(item: currentItemIndex, section: 0)) as! MemoryCollectionViewCell
             beepAudioPlayer?.play()
-            
+
             timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-                self.readMemory(indexPath: IndexPath(item: self.currentItemIndex, section: self.currentSectionIndex))
+                self.readText(text: self.data?.data[self.currentItemIndex].sceneName ?? "")
             }
         }
     }
@@ -286,22 +199,21 @@ extension MemoryViewController: UICollectionViewDataSource {
     
     // Number of sections
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return data?.data.count ?? 0
+//        return data?.data.count ?? 0
+        return 1
     }
     
     // Number of items in each section
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data?.data[section].labels?.count ?? 0
+//        return data?.data[section].labels?.count ?? 0
+        return data?.data.count ?? 0
     }
     
     // Configure each cell
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellID, for: indexPath) as! MemoryCollectionViewCell
-        if let label = data?.data[indexPath.section].labels?[indexPath.item] {
-            cell.renderLabel(label: label)
-//            cell.doubleTapAction = {
-//                self.handleDoubleTapCell(indexPath: indexPath)
-//            }
+        if let scene = data?.data[indexPath.item] {
+            cell.renderScene(scene: scene)
         }
         return cell
     }
@@ -310,7 +222,7 @@ extension MemoryViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionHeaderID, for: indexPath) as! MemorySectionHeaderView
-            header.configureTitle(title: data?.data[indexPath.section].sceneName ?? "")
+            header.configureTitle(title: "用户" + LogHelper.UserId)
             return header
         }
         return UICollectionReusableView()
@@ -348,26 +260,21 @@ extension MemoryViewController: UIGestureRecognizerDelegate {
 
 extension MemoryViewController: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        if let indexPath = lastSelectedIndexPath {
-            if let recordName = data?.data[indexPath.section].labels?[indexPath.item].recordName {
-                NetworkRequester.requestLabelAudioAndPlay(
-                    sceneID: data?.data[indexPath.section].sceneId ?? "",
-                    labelID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0,
-                    recordName: recordName) { localURL in
-                        if self.lastSelectedIndexPath == indexPath,
-                        let localURL = localURL {
-                            AudioHelper.playFile(url: localURL)
-                        }
-                    }
-            }
-//            else {
-//                AudioHelper.playRecording(
-//                    sceneID: data?.data[indexPath.section].sceneId ?? "",
-//                    objectID: data?.data[indexPath.section].labels?[indexPath.item].labelId ?? 0)
+//        if let indexPath = lastSelectedIndexPath {
+//            if let recordName = data?.data[indexPath.section].labels?[indexPath.item].recordName {
+//                NetworkRequester.requestLabelAudioAndPlay(
+//                    token: LogHelper.UserId,
+//                    recordName: recordName) { localURL in
+//                        if self.lastSelectedIndexPath == indexPath,
+//                        let localURL = localURL {
+//                            AudioHelper.playFile(url: localURL)
+//                        }
+//                    }
 //            }
-        } else if let indexPath = indexPathPendingExpand {
+//        } else if let indexPath = indexPathPendingExpand {
+        if let indexPath = indexPathPendingExpand {
             let fixationViewController = FixationViewController()
-            fixationViewController.fromScene = data?.data[indexPath.section]
+            fixationViewController.fromScene = data?.data[indexPath.item]
             fixationViewController.isFromLabel = true
             fixationViewController.modalPresentationStyle = .fullScreen
             present(fixationViewController, animated: true, completion: nil)
@@ -376,14 +283,3 @@ extension MemoryViewController: AVSpeechSynthesizerDelegate {
         }
     }
 }
-
-//extension MemoryViewController: AVSpeechSynthesizerDelegate {
-//    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-//        
-//        timer?.invalidate()
-//        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
-//            self.currentItemIndex += 1
-//            self.readCurrentSceneItem()
-//        }
-//    }
-//}
